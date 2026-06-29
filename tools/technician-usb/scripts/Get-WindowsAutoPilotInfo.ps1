@@ -34,4 +34,3 @@ if ($usbDrive) {
     Write-Host "Drive with label 'AUTOPILOTUSB' not found."
 }
 Write-Host "Reboot the machine and upload the Hardware ID file to the approved enrollment location."
-

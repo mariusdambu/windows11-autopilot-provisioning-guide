@@ -302,6 +302,123 @@ h1 {
   background: #f2fbf7;
 }
 
+.foldout {
+  margin: 18px 0;
+  border: 1px solid #c9d8ee;
+  border-radius: 8px;
+  background: #f8fbff;
+  overflow: hidden;
+}
+
+.foldout.compact {
+  border-color: #efd69a;
+  background: #fffaf0;
+}
+
+.foldout > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 72px;
+  padding: 15px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.foldout > summary::-webkit-details-marker {
+  display: none;
+}
+
+.foldout > summary::marker {
+  content: "";
+}
+
+.foldout > summary:hover {
+  background: #eef6ff;
+}
+
+.foldout.compact > summary:hover {
+  background: #fff3d6;
+}
+
+.foldout-title {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.foldout-title strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.foldout-title small {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.foldout-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 126px;
+  min-height: 38px;
+  border: 1px solid var(--blue);
+  border-radius: 7px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 7px 10px;
+  text-align: center;
+}
+
+.foldout.compact .foldout-action {
+  border-color: var(--amber);
+  background: var(--amber);
+}
+
+.open-label {
+  display: none;
+}
+
+.foldout[open] .closed-label {
+  display: none;
+}
+
+.foldout[open] .open-label {
+  display: inline;
+}
+
+.chevron {
+  display: inline-block;
+  font-size: 0.82rem;
+  line-height: 1;
+  transition: transform 0.16s ease;
+}
+
+.foldout[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.foldout-body {
+  border-top: 1px solid var(--line);
+  background: #fff;
+  padding: 16px;
+}
+
+.foldout-body > :first-child {
+  margin-top: 0;
+}
+
+.foldout-body > :last-child {
+  margin-bottom: 0;
+}
+
 .highlight-step {
   border: 2px solid var(--blue);
   border-radius: 8px;
@@ -315,17 +432,27 @@ h1 {
   display: inline-grid;
   width: 30px;
   height: 30px;
-  place-items: center;
   margin: 0 4px;
   border: 2px solid #0f2f66;
   border-bottom-width: 4px;
   border-radius: 6px;
   background: #172033;
   color: #fff;
-  font-size: 1.1rem;
-  font-weight: 800;
   line-height: 1;
+  place-items: center;
   vertical-align: middle;
+}
+
+.windows-key {
+  grid-template-columns: repeat(2, 8px);
+  gap: 2px;
+}
+
+.windows-pane {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: #fff;
 }
 
 code {
@@ -492,6 +619,15 @@ th {
     padding: 20px;
   }
 
+  .foldout > summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .foldout-action {
+    width: 100%;
+  }
+
   h1 {
     font-size: 2.05rem;
   }
@@ -581,5 +717,25 @@ th {
 
   .copy-button {
     display: none;
+  }
+
+  .foldout {
+    break-inside: avoid;
+    border-color: var(--line);
+    background: #fff;
+  }
+
+  .foldout > summary {
+    min-height: 0;
+    padding: 8pt 0;
+  }
+
+  .foldout-action {
+    display: none;
+  }
+
+  .foldout-body {
+    border-top: 1px solid var(--line);
+    padding: 8pt 0 0;
   }
 }

@@ -116,19 +116,45 @@
                 Use a Windows technician PC with administrator rights. DISM is included with Windows
                 and is normally enough for mounting images, injecting drivers, and committing the WIM.
               </li>
-              <li>
-                Install Windows ADK only if you need ADK-specific tools such as <code>oscdimg</code>,
-                WinPE media creation, or other deployment tooling:
-                <a href="https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install">ADK installation guide</a>.
-              </li>
               <li>Use only vendor drivers. Do not inject apps, scripts, language packs, or modified ISO content into the base image.</li>
             </ul>
+
+            <details class="foldout compact">
+              <summary>
+                <span class="foldout-title">
+                  <strong>Optional ADK tools</strong>
+                  <small>Only needed for ADK-specific tools such as oscdimg or WinPE media creation.</small>
+                </span>
+                <span class="foldout-action" aria-hidden="true">
+                  <span class="closed-label">Show details</span>
+                  <span class="open-label">Hide details</span>
+                  <span class="chevron">v</span>
+                </span>
+              </summary>
+              <div class="foldout-body">
+                <p>
+                  Windows ADK is not required for normal DISM mounting, driver injection, or
+                  committing a WIM when using the tools already included with Windows. Install ADK
+                  only if you need ADK-specific deployment tools such as <code>oscdimg</code>, WinPE
+                  media creation, or other deployment tooling.
+                </p>
+                <p>
+                  Microsoft reference:
+                  <a href="https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install">ADK installation guide</a>.
+                </p>
+              </div>
+            </details>
 
             <div class="callout warning">
               <strong>Do not use corporate network access during provisioning.</strong>
               Use a free Wi-Fi connection or an approved guest Wi-Fi. Do not use corporate Wi-Fi,
               a corporate wired network, or any network path that would make the laptop join internal
               resources before Autopilot has completed.
+            </div>
+            <div class="callout warning">
+              <strong>Do not use a corporate-managed laptop as the technician workstation.</strong>
+              Use an unmanaged laptop, or a company spare laptop with a clean, original Windows 11
+              installation preinstalled, to prepare and run this process.
             </div>
 
             <h3>User and portal checks</h3>
@@ -154,14 +180,22 @@
           <section class="section" id="dism">
             <h2>3. Build the ISO with DISM</h2>
             <p>
-              Engineers can manually build the image using DISM. The examples below follow the
-              same working-folder convention used by
-              <a href="https://github.com/mariusdambu/Lab_Win11">mariusdambu/Lab_Win11</a>.
-              The example driver folder uses a Lenovo T14, but the same pattern applies to other
-              supported models.
+              Engineers can build the image using DISM when automation is not available or when
+              full manual control is required. The examples below use the same
+              <code>C:\Lab_Win11\Trabajo</code> working-folder convention as the recommended
+              automation path. The example driver folder uses a Lenovo T14, but the same pattern
+              applies to other supported models.
             </p>
+            <div class="callout success">
+              <strong>Recommended simpler path:</strong>
+              for most technicians, the fastest and least error-prone option is to automate the DISM
+              workflow and ISO generation with
+              <a href="https://github.com/mariusdambu/Lab_Win11">mariusdambu/Lab_Win11</a>.
+              Use the manual DISM commands when you need full control or when automation is not
+              available.
+            </div>
             <div class="callout note">
-              <strong>This driver-injection step is optional.</strong>
+              <strong>This driver-injection step is optional but useful.</strong>
               Technicians can use the original Windows 11 ISO or USB. If Wi-Fi drivers are not
               injected, Windows may not detect the laptop Wi-Fi adapter during setup or OOBE, so
               the technician may need to load or install the correct Wi-Fi driver manually.
@@ -211,18 +245,11 @@ C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
               </table>
             </div>
             <p>
-              The manual commands below assume <code>install.wim</code>. If the ISO contains
+              These files are the input for either the Lab_Win11 automation or the manual DISM
+              commands. The manual examples assume <code>install.wim</code>. If the ISO contains
               <code>install.esd</code> or split <code>install*.swm</code> files, use the Lab_Win11
               helper flow to prepare the working image, or adjust the DISM commands accordingly.
             </p>
-
-            <h3>Mount the install.wim</h3>
-            <pre><code>dism /Get-WimInfo /WimFile:"C:\Lab_Win11\Trabajo\images\install.wim"
-dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 /MountDir:"C:\Lab_Win11\Trabajo\offline" /CheckIntegrity</code></pre>
-            <div class="callout note">
-              <strong>Index check:</strong> Windows 11 Pro is usually index 6.
-              Always confirm the correct index with <code>/Get-WimInfo</code> before mounting.
-            </div>
 
             <h3>Inject vendor drivers</h3>
             <p>
@@ -233,18 +260,44 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </p>
             <p>Place the downloaded model-specific drivers in a folder, for example:</p>
             <pre><code>C:\Lab_Win11\Trabajo\Drivers\T14</code></pre>
-            <p>Inject the drivers into the mounted image:</p>
-            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Driver /Driver:"C:\Lab_Win11\Trabajo\Drivers\T14" /Recurse</code></pre>
 
-            <h3>Optional packages</h3>
-            <p>
-              If approved CAB or MSU packages are required, place them under
-              <code>C:\Lab_Win11\Trabajo\packages</code> and add them from there.
-            </p>
-            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Package /PackagePath:"C:\Lab_Win11\Trabajo\packages"</code></pre>
+            <details class="foldout">
+              <summary>
+                <span class="foldout-title">
+                  <strong>Manual DISM commands</strong>
+                  <small>Open this only when you need to mount the image, inject drivers, and commit manually.</small>
+                </span>
+                <span class="foldout-action" aria-hidden="true">
+                  <span class="closed-label">Show commands</span>
+                  <span class="open-label">Hide commands</span>
+                  <span class="chevron">v</span>
+                </span>
+              </summary>
+              <div class="foldout-body">
+                <h4>Mount the install.wim</h4>
+                <pre><code>dism /Get-WimInfo /WimFile:"C:\Lab_Win11\Trabajo\images\install.wim"
+dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 /MountDir:"C:\Lab_Win11\Trabajo\offline" /CheckIntegrity</code></pre>
+                <div class="callout note">
+                  <strong>Index check:</strong> Windows 11 Pro is usually index 6.
+                  Always confirm the correct index with <code>/Get-WimInfo</code> before mounting.
+                </div>
 
-            <h3>Commit and unmount</h3>
-            <pre><code>dism /Unmount-Image /MountDir:"C:\Lab_Win11\Trabajo\offline" /Commit /CheckIntegrity</code></pre>
+                <h4>Inject drivers into the mounted image</h4>
+                <p>Run this command after the image is mounted:</p>
+                <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Driver /Driver:"C:\Lab_Win11\Trabajo\Drivers\T14" /Recurse</code></pre>
+
+                <h4>Optional: inject Windows packages</h4>
+                <p>
+                  Only use this if approved CAB or MSU packages are required. Place them under
+                  <code>C:\Lab_Win11\Trabajo\packages</code> and add them from there before committing
+                  the image.
+                </p>
+                <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Package /PackagePath:"C:\Lab_Win11\Trabajo\packages"</code></pre>
+
+                <h4>Commit and unmount</h4>
+                <pre><code>dism /Unmount-Image /MountDir:"C:\Lab_Win11\Trabajo\offline" /Commit /CheckIntegrity</code></pre>
+              </div>
+            </details>
 
             <h3>After injecting drivers</h3>
             <p>
@@ -253,7 +306,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </p>
             <ul>
               <li>
-                <strong>ISO path:</strong> use the Lab_Win11 ISO creation option. It uses the base
+                <strong>ISO path:</strong> use the automated ISO creation option. It uses the base
                 ISO from <code>Trabajo\ISOs</code>, the updated images from
                 <code>Trabajo\images</code>, and writes the final ISO back to
                 <code>Trabajo\ISOs</code>.
@@ -267,37 +320,44 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </li>
             </ul>
 
-            <h3>Create the bootable ISO</h3>
-            <p>
-              If you need to generate a new ISO file, use <code>oscdimg</code>. This tool is part of
-              the Windows ADK Deployment Tools. In the Lab_Win11 workflow, keep the base Windows
-              ISO in <code>Trabajo\ISOs</code>, keep customized <code>boot.wim</code> and
-              <code>install.*</code> files in <code>Trabajo\images</code>, and save the generated
-              ISO back to <code>Trabajo\ISOs</code>.
-            </p>
-            <div class="callout success">
-              <strong>Best match with Lab_Win11:</strong> use the Lab_Win11 ISO creation option.
-              It reads the base ISO from <code>Trabajo\ISOs</code>, uses custom images from
-              <code>Trabajo\images</code>, prepares the temporary media internally, and writes the
-              final ISO to <code>Trabajo\ISOs</code>.
-            </div>
-
-            <h3>Simpler automation option</h3>
-            <div class="callout success">
-              <strong>Recommended simpler path:</strong>
-              for most technicians, the fastest and least error-prone option is to automate the DISM
-              workflow and ISO generation with
-              <a href="https://github.com/mariusdambu/Lab_Win11">mariusdambu/Lab_Win11</a>.
-              Use the manual DISM commands when you need full control or when automation is not
-              available.
-            </div>
+            <details class="foldout compact">
+              <summary>
+                <span class="foldout-title">
+                  <strong>Advanced: rebuild ISO manually with ADK tools</strong>
+                  <small>Only if you are not using the automated ISO creation option.</small>
+                </span>
+                <span class="foldout-action" aria-hidden="true">
+                  <span class="closed-label">Show details</span>
+                  <span class="open-label">Hide details</span>
+                  <span class="chevron">v</span>
+                </span>
+              </summary>
+              <div class="foldout-body">
+                <p>
+                  If you need to generate a new ISO file manually, use <code>oscdimg</code>. This
+                  tool is part of the Windows ADK Deployment Tools. In this workflow, keep
+                  the base Windows ISO in <code>Trabajo\ISOs</code>, keep customized
+                  <code>boot.wim</code> and <code>install.*</code> files in
+                  <code>Trabajo\images</code>, and save the generated ISO back to
+                  <code>Trabajo\ISOs</code>.
+                </p>
+                <div class="callout success">
+                  <strong>Recommended:</strong> use the automated ISO creation option.
+                  It reads the base ISO from <code>Trabajo\ISOs</code>, uses custom images from
+                  <code>Trabajo\images</code>, prepares the temporary media internally, and writes the
+                  final ISO to <code>Trabajo\ISOs</code>.
+                </div>
+              </div>
+            </details>
           </section>
 
           <section class="section" id="usb">
             <h2>4. Create the bootable USB</h2>
             <p>
-              Create a bootable USB with Rufus, selecting the modified Windows files or ISO.
-              If preparing the disk manually, use PowerShell and confirm the disk number first.
+              Use the Microsoft-documented two-partition USB layout below as the primary method.
+              This keeps the boot partition simple and the Windows setup files separate from the
+              large image files. Rufus can still be used as an optional shortcut when you are
+              selecting a prepared ISO, but the resulting USB must match the required structure.
             </p>
             <div class="callout note">
               <strong>USB recommendation:</strong> use a pendrive of at least 16 GB. A USB 3.0 or
@@ -437,7 +497,12 @@ pause</code></pre>
               <li>When the work or school setup screen appears, confirm the user has the required Azure group memberships before continuing.</li>
               <li class="highlight-step">
                 At OOBE, press the Windows key
-                <span class="inline-keycap" aria-label="Windows key">⊞</span>
+                <span class="inline-keycap windows-key" aria-label="Windows key">
+                  <span class="windows-pane"></span>
+                  <span class="windows-pane"></span>
+                  <span class="windows-pane"></span>
+                  <span class="windows-pane"></span>
+                </span>
                 <strong>five times</strong> to open the provisioning options.
               </li>
               <li>Select <strong>Pre-provision with Windows Autopilot</strong>, then select <strong>Next</strong>.</li>
@@ -464,6 +529,10 @@ pause</code></pre>
               <figure>
                 <img src="assets/img/11-second-keyboard-layout.jpg" alt="OOBE second keyboard layout prompt">
                 <figcaption>Skip the second keyboard layout unless required.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/14-work-school-sign-in.jpg" alt="OOBE work or school sign-in screen">
+                <figcaption>Do not connect the user account until the required Azure groups are confirmed.</figcaption>
               </figure>
               <figure>
                 <img src="assets/img/15-provisioning-options.jpg" alt="Autopilot provisioning options screen">
@@ -511,8 +580,8 @@ pause</code></pre>
               <li>Confirm that the laptop can now use the corporate Wi-Fi.</li>
             </ol>
             <p>
-              If you do not have permissions, ask the approved endpoint engineering support
-              channel for help.
+              If you do not have permissions or need clarification, follow the approved company
+              escalation matrix for endpoint engineering support.
             </p>
           </section>
 
@@ -535,7 +604,7 @@ pause</code></pre>
               <li>The script creates <code>C:\HWID</code>, installs/runs <code>Get-WindowsAutopilotInfo</code>, and exports a CSV.</li>
               <li>When the USB label is correct, the file is copied to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot HWID upload path&gt;</code>.</li>
-              <li>Then contact the approved endpoint engineering support channel to request Autopilot enrollment.</li>
+              <li>Then follow the approved company escalation matrix to request Autopilot enrollment.</li>
             </ol>
 
             <div class="callout note">
@@ -618,19 +687,33 @@ pause</code></pre>
               <li>Confirm that the CSV appears in <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the CSV to the approved Autopilot HWID upload location.</li>
             </ol>
-            <h3>Option B - additional GetAutoPilot helper</h3>
-            <ol>
-              <li>
-                After downloading or cloning this project, copy everything inside
-                <code>tools\technician-usb</code> to the root of the technician USB.
-              </li>
-              <li>Keep the <code>GetAutoPilot</code> folder at the USB root.</li>
-              <li>Open the <code>GetAutoPilot</code> folder on the technician USB.</li>
-              <li>Run <code>GetAutoPilot.CMD</code>.</li>
-              <li>The helper runs its local <code>Get-WindowsAutoPilotInfo.ps1</code> script.</li>
-              <li>The CSV is saved in the same <code>GetAutoPilot</code> folder.</li>
-              <li>Use this as a second option when you want a direct local export instead of the standard workbench HWID flow.</li>
-            </ol>
+            <details class="foldout compact">
+              <summary>
+                <span class="foldout-title">
+                  <strong>Option B - additional GetAutoPilot helper</strong>
+                  <small>Second option only. Use Option A unless instructed otherwise.</small>
+                </span>
+                <span class="foldout-action" aria-hidden="true">
+                  <span class="closed-label">Show details</span>
+                  <span class="open-label">Hide details</span>
+                  <span class="chevron">v</span>
+                </span>
+              </summary>
+              <div class="foldout-body">
+                <ol>
+                  <li>
+                    After downloading or cloning this project, copy everything inside
+                    <code>tools\technician-usb</code> to the root of the technician USB.
+                  </li>
+                  <li>Keep the <code>GetAutoPilot</code> folder at the USB root.</li>
+                  <li>Open the <code>GetAutoPilot</code> folder on the technician USB.</li>
+                  <li>Run <code>GetAutoPilot.CMD</code>.</li>
+                  <li>The helper runs its local <code>Get-WindowsAutoPilotInfo.ps1</code> script.</li>
+                  <li>The CSV is saved in the same <code>GetAutoPilot</code> folder.</li>
+                  <li>Use this as a second option when you want a direct local export instead of the standard workbench HWID flow.</li>
+                </ol>
+              </div>
+            </details>
             <h3>Included tool folder layout</h3>
             <pre><code>tools\technician-usb
   safeworkbench-en.cmd

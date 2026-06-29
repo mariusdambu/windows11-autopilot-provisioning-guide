@@ -15,6 +15,7 @@ Command blocks also include **Copy** buttons for one-click command copying.
 .
 +-- index.html
 +-- README.md
++-- PUBLICATION_REVIEW.md
 +-- assets
     +-- css
     |   +-- styles.css
@@ -35,8 +36,8 @@ Command blocks also include **Copy** buttons for one-click command copying.
 
 ## Important notes
 
-- This is a public-safe version. Organization-specific group names, support contacts, network names, and internal upload paths are represented with placeholders.
-- Screenshots were redacted or omitted where they contained tenant/profile/QR data, organization names, or Wi-Fi SSIDs.
+- The guide includes Intact-specific operational details requested for technicians.
+- Screenshots were redacted where they contained tenant/profile/QR data or unrelated Wi-Fi SSIDs.
 - Technician USB tools are included under `tools/technician-usb`.
 - `safeworkbench-en.cmd` is recommended for technicians because it asks for confirmation before wiping Disk 0.
 - `GetAutoPilot/GetAutoPilot.CMD` is included as an additional second option for local hardware hash export.
@@ -47,7 +48,7 @@ Command blocks also include **Copy** buttons for one-click command copying.
 - The guide explains where to copy `sources\boot.wim` and `sources\install.*` from the mounted
   Windows ISO, and how to rebuild either the ISO or the USB after driver injection.
 - Command blocks wrap on screen and in print so long DISM commands remain visible while still copying correctly with the Copy button.
-- Keep any internal version containing real tenant names, support contacts, or network paths in a private location.
+- Do not push this project to a public GitHub repository until `PUBLICATION_REVIEW.md` is resolved.
 
 ## Prepare the technician USB
 
@@ -61,4 +62,4 @@ Command blocks also include **Copy** buttons for one-click command copying.
 
 ## GitHub status
 
-This public-safe version is structured for GitHub Pages.
+The project is structured for GitHub, but it has not been pushed. Review and approve publication first.

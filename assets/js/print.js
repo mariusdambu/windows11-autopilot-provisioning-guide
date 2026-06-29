@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (button) {
     button.addEventListener("click", () => {
+      openDetailsForPrint();
       window.print();
     });
   }
@@ -62,3 +63,29 @@ function fallbackCopy(text) {
     textarea.remove();
   }
 }
+
+let detailsOpenedForPrint = [];
+let printDetailsAreOpen = false;
+
+function openDetailsForPrint() {
+  if (printDetailsAreOpen) {
+    return;
+  }
+
+  detailsOpenedForPrint = Array.from(document.querySelectorAll("details:not([open])"));
+  detailsOpenedForPrint.forEach((detail) => {
+    detail.open = true;
+  });
+  printDetailsAreOpen = true;
+}
+
+function restoreDetailsAfterPrint() {
+  detailsOpenedForPrint.forEach((detail) => {
+    detail.open = false;
+  });
+  detailsOpenedForPrint = [];
+  printDetailsAreOpen = false;
+}
+
+window.addEventListener("beforeprint", openDetailsForPrint);
+window.addEventListener("afterprint", restoreDetailsAfterPrint);
