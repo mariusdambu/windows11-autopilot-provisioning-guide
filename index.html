@@ -615,7 +615,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                 Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>. The script searches
                 for this label; if it is wrong, the CSV will not be copied back to the USB correctly.
               </li>
-              <li>For the recommended method, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before running the hash capture.</li>
+              <li>Before using <strong>4 - Create hardware hash file (recommended - Wi-Fi)</strong>, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.</li>
               <li>Run <code>Run-HWID.cmd</code> or select <strong>4 - Create hardware hash file (recommended - Wi-Fi)</strong> from <code>safeworkbench-en.cmd</code>.</li>
               <li>The recommended method creates <code>C:\HWID</code>, downloads/updates <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, and exports a CSV.</li>
               <li>If Wi-Fi cannot be connected or the PowerShell Gallery download fails, select <strong>5 - Create hardware hash file (offline fallback)</strong> instead.</li>
@@ -626,7 +626,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </ol>
 
             <div class="callout note">
-              <strong>The recommended method needs internet.</strong>
+              <strong>Run option 4 only after Wi-Fi is connected.</strong>
               The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow downloads or updates
               <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, so the laptop must
               already be connected to an approved Wi-Fi or approved non-corporate network before
@@ -635,7 +635,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               enroll the device. If Wi-Fi cannot be connected or the download fails, use the offline fallback.
             </div>
             <div class="callout note">
-              <strong>The offline fallback works without internet.</strong>
+              <strong>Option 5 works without internet.</strong>
               The <code>GetAutoPilot\GetAutoPilot.CMD</code> helper runs from the technician USB
               without internet access and saves the CSV in the <code>GetAutoPilot</code> folder.
             </div>
@@ -707,7 +707,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </li>
               <li>Confirm the USB root contains <code>safeworkbench-en.cmd</code>, <code>scripts\</code>, <code>GetAutoPilot\</code>, and <code>HardwareIDs\</code>.</li>
               <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>.</li>
-              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before using the recommended method.</li>
+              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before selecting option 4.</li>
               <li>Boot or open Command Prompt on the target laptop.</li>
               <li>Open the technician USB drive.</li>
               <li>Run <code>safeworkbench-en.cmd</code>.</li>
@@ -720,7 +720,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               <summary>
                 <span class="foldout-title">
                   <strong>Offline fallback - GetAutoPilot helper</strong>
-                  <small>Use when Wi-Fi is not available or the download fails.</small>
+                  <small>No internet required. Use when Wi-Fi is not available or the download fails.</small>
                 </span>
                 <span class="foldout-action" aria-hidden="true">
                   <span class="closed-label">Show details</span>

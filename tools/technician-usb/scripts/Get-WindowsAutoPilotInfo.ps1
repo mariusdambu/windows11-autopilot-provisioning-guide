@@ -52,7 +52,8 @@ Write-Line "============================================================"
 Write-Line "        Hardware hash file capture - recommended method"
 Write-Line "============================================================"
 Write-Line
-Write-Info "This option requires internet access to PowerShell Gallery."
+Write-Info "Run this only after the laptop is connected to approved Wi-Fi."
+Write-Info "This method downloads Get-WindowsAutopilotInfo from PowerShell Gallery."
 Write-Info "This script does not upload anything to Intune."
 Write-Line
 

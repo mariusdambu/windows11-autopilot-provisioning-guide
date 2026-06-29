@@ -130,10 +130,10 @@ REM START: HWID - Generates hardware hash with online PowerShell Gallery workflo
 cls
 echo =====================================
 echo      CREATE HARDWARE HASH FILE
-echo      Recommended method - needs Wi-Fi
+echo      Recommended method - Wi-Fi required
 echo =====================================
 echo.
-echo Requires approved Wi-Fi and internet access.
+echo Use this only after the laptop is connected to approved Wi-Fi.
 echo Downloads Get-WindowsAutopilotInfo from PowerShell Gallery.
 echo.
 
@@ -153,6 +153,7 @@ echo      CREATE HARDWARE HASH FILE
 echo      Offline fallback
 echo =====================================
 echo.
+echo No internet connection is required.
 echo Runs GetAutoPilot\GetAutoPilot.CMD from the technician USB.
 echo The CSV is saved in the GetAutoPilot folder.
 echo.
