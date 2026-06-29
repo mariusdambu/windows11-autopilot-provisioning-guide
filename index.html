@@ -154,17 +154,28 @@
           <section class="section" id="dism">
             <h2>3. Build the ISO with DISM</h2>
             <p>
-              Engineers can manually build the image using DISM. The example below uses a Lenovo T14 driver folder, but the same pattern applies
-              to other supported models.
+              Engineers can manually build the image using DISM. The examples below follow the
+              same working-folder convention used by
+              <a href="https://github.com/mariusdambu/Lab_Win11">mariusdambu/Lab_Win11</a>.
+              The example driver folder uses a Lenovo T14, but the same pattern applies to other
+              supported models.
             </p>
 
-            <h3>Extract the Windows ISO</h3>
-            <p>Mount or extract the Windows 11 ISO, then copy all contents to a working folder.</p>
-            <pre><code>C:\ISO\Win11</code></pre>
+            <h3>Prepare the Lab_Win11 folders</h3>
+            <p>
+              Download the ZIP from the official GitHub repository and extract it to a local
+              folder, for example <code>C:\Lab_Win11</code>. Use the <code>Trabajo</code> folder
+              structure for all deployment payload:
+            </p>
+            <pre><code>C:\Lab_Win11
+C:\Lab_Win11\Trabajo\ISOs      - Windows ISO files
+C:\Lab_Win11\Trabajo\images    - boot.wim, install.wim, install.esd or install*.swm
+C:\Lab_Win11\Trabajo\Drivers   - extracted INF drivers
+C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
 
             <h3>Mount the install.wim</h3>
-            <pre><code>dism /Get-WimInfo /WimFile:C:\ISO\Win11\sources\install.wim
-dism /Mount-Wim /WimFile:C:\ISO\Win11\sources\install.wim /Index:6 /MountDir:C:\Mount</code></pre>
+            <pre><code>dism /Get-WimInfo /WimFile:"C:\Lab_Win11\Trabajo\images\install.wim"
+dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 /MountDir:"C:\Lab_Win11\Trabajo\offline" /CheckIntegrity</code></pre>
             <div class="callout note">
               <strong>Index check:</strong> Windows 11 Pro is usually index 6.
               Always confirm the correct index with <code>/Get-WimInfo</code> before mounting.
@@ -178,19 +189,20 @@ dism /Mount-Wim /WimFile:C:\ISO\Win11\sources\install.wim /Index:6 /MountDir:C:\
               Support for Dell models, HP Support for HP models, and so on.
             </p>
             <p>Place the downloaded model-specific drivers in a folder, for example:</p>
-            <pre><code>C:\Drivers\T14</code></pre>
+            <pre><code>C:\Lab_Win11\Trabajo\Drivers\T14</code></pre>
             <p>Inject the drivers into the mounted image:</p>
-            <pre><code>dism /Image:C:\Mount /Add-Driver /Driver:C:\Drivers\T14 /Recurse</code></pre>
+            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Driver /Driver:"C:\Lab_Win11\Trabajo\Drivers\T14" /Recurse</code></pre>
 
             <h3>Commit and unmount</h3>
-            <pre><code>dism /Unmount-Wim /MountDir:C:\Mount /Commit</code></pre>
+            <pre><code>dism /Unmount-Image /MountDir:"C:\Lab_Win11\Trabajo\offline" /Commit /CheckIntegrity</code></pre>
 
             <h3>Create the bootable ISO</h3>
             <p>
               If you need to generate a new ISO file, use <code>oscdimg</code>. This tool is part of
-              the Windows ADK Deployment Tools.
+              the Windows ADK Deployment Tools. Keep the source Windows setup files under the
+              lab working area and save generated ISO files under <code>Trabajo\ISOs</code>.
             </p>
-            <pre><code>oscdimg -bC:\ISO\Win11\boot\etfsboot.com -u2 -h -m -lWIN11_AUTO C:\ISO\Win11 C:\ISO\Win11_Autopilot.iso</code></pre>
+            <pre><code>oscdimg -b"C:\Lab_Win11\Trabajo\ISOs\Win11_Source\boot\etfsboot.com" -u2 -h -m -lWIN11_AUTO "C:\Lab_Win11\Trabajo\ISOs\Win11_Source" "C:\Lab_Win11\Trabajo\ISOs\Win11_Autopilot.iso"</code></pre>
 
             <h3>Simpler automation option</h3>
             <div class="callout success">
