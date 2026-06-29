@@ -367,21 +367,23 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             <p>Run the commands one line at a time. First list the disks:</p>
             <pre><code>Get-Disk</code></pre>
             <p>
-              Identify the USB disk number from the output. Then set the variable below to that
-              exact USB disk number. Do not continue until you are certain it is the USB device.
+              Identify the USB disk number from the output. The commands below use
+              <strong>Disk 5 as an example</strong>. If your USB appears as another disk number,
+              replace <strong>5</strong> with the real USB disk number in every command before
+              copying or running it.
             </p>
-            <pre><code>[int]$UsbDiskNumber = Read-Host "Enter the USB disk number shown by Get-Disk"</code></pre>
-            <p>Verify the selected disk before wiping anything:</p>
-            <pre><code>Get-Disk -Number $UsbDiskNumber | Format-List Number,FriendlyName,SerialNumber,Size,BusType</code></pre>
+            <p>Verify the example disk number before wiping anything:</p>
+            <pre><code>Get-Disk -Number 5 | Format-List Number,FriendlyName,SerialNumber,Size,BusType</code></pre>
             <div class="callout warning">
               <strong>Disk number warning:</strong> the commands below erase the selected disk.
-              Only continue if <code>$UsbDiskNumber</code> points to the USB drive, not the internal
-              laptop disk.
+              Only continue if <code>Disk 5</code> is the USB drive. If the USB is shown as
+              <code>Disk 2</code>, <code>Disk 3</code>, or any other number, change the number in
+              every command first. Never run these commands against the internal laptop disk.
             </div>
-            <pre><code>Clear-Disk -Number $UsbDiskNumber -RemoveData -RemoveOEM</code></pre>
-            <pre><code>Set-Disk -Number $UsbDiskNumber -PartitionStyle GPT</code></pre>
-            <pre><code>New-Partition -DiskNumber $UsbDiskNumber -Size 2048MB -AssignDriveLetter | Format-Volume -FileSystem FAT32</code></pre>
-            <pre><code>New-Partition -DiskNumber $UsbDiskNumber -UseMaximumSize -AssignDriveLetter | Format-Volume -FileSystem exFAT</code></pre>
+            <pre><code>Clear-Disk -Number 5 -RemoveData -RemoveOEM</code></pre>
+            <pre><code>Set-Disk -Number 5 -PartitionStyle GPT</code></pre>
+            <pre><code>New-Partition -DiskNumber 5 -Size 2048MB -AssignDriveLetter | Format-Volume -FileSystem FAT32</code></pre>
+            <pre><code>New-Partition -DiskNumber 5 -UseMaximumSize -AssignDriveLetter | Format-Volume -FileSystem exFAT</code></pre>
 
             <h3>Required partition structure</h3>
             <p>
