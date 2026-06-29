@@ -40,7 +40,8 @@ Command blocks also include **Copy** buttons for one-click command copying.
 - Screenshots were redacted or omitted where they contained tenant/profile/QR data, organization names, or Wi-Fi SSIDs.
 - Technician USB tools are included under `tools/technician-usb`.
 - `safeworkbench-en.cmd` is recommended for technicians because it asks for confirmation before wiping Disk 0.
-- `GetAutoPilot/GetAutoPilot.CMD` is included as an additional second option for local hardware hash export.
+- HWID Option A uses approved Wi-Fi/internet access to download `Get-WindowsAutopilotInfo` from PowerShell Gallery.
+- HWID Option B uses the offline `GetAutoPilot/GetAutoPilot.CMD` helper and saves the CSV in the `GetAutoPilot` folder.
 - Manual DISM examples follow the `mariusdambu/Lab_Win11` payload folder convention:
   `C:\Lab_Win11\Trabajo\ISOs`, `C:\Lab_Win11\Trabajo\images`,
   `C:\Lab_Win11\Trabajo\Drivers`, and `C:\Lab_Win11\Trabajo\packages`.
@@ -59,6 +60,7 @@ Command blocks also include **Copy** buttons for one-click command copying.
 5. Create a `HardwareIDs` folder at the root of the USB if it is missing.
 6. Rename the USB volume label to exactly `AUTOPILOTUSB` before running HWID capture.
 7. Run `safeworkbench-en.cmd` as the preferred technician menu.
+8. Use option `4` for the online HWID workflow, or option `B` if Wi-Fi is not available or the PowerShell Gallery download fails.
 
 ## GitHub status
 

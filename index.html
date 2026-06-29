@@ -615,10 +615,10 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                 Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>. The script searches
                 for this label; if it is wrong, the CSV will not be copied back to the USB correctly.
               </li>
-              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.</li>
-              <li>Run <code>Run-HWID.cmd</code> or option 4 from <code>safeworkbench-en.cmd</code>.</li>
-              <li>The script creates <code>C:\HWID</code>, installs/runs <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, and exports a CSV.</li>
-              <li>If Option A fails because PowerShell Gallery cannot be reached, connect Wi-Fi and run Option A again. If Wi-Fi cannot be connected at that stage, use Option B instead.</li>
+              <li>For Option A, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before running the HWID capture.</li>
+              <li>Run <code>Run-HWID.cmd</code> or option <strong>4 - HWID Option A</strong> from <code>safeworkbench-en.cmd</code>.</li>
+              <li>Option A creates <code>C:\HWID</code>, downloads/updates <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, and exports a CSV.</li>
+              <li>If Wi-Fi cannot be connected or the PowerShell Gallery download fails, use <strong>Option B</strong> instead.</li>
               <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
               <li>When the USB label is correct, the file is copied to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot HWID upload path&gt;</code>.</li>
@@ -628,9 +628,16 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             <div class="callout note">
               <strong>Option A needs internet.</strong>
               The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow downloads or updates
-              <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery. It only generates a
+              <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, so the laptop must
+              already be connected to an approved Wi-Fi or approved non-corporate network before
+              running it. It only generates a
               local CSV and copies it to the USB; it does not upload the CSV to Intune and does not
-              enroll the device. If Option A cannot reach PowerShell Gallery, use Option B.
+              enroll the device. If Wi-Fi cannot be connected or the download fails, use Option B.
+            </div>
+            <div class="callout note">
+              <strong>Option B works offline.</strong>
+              The <code>GetAutoPilot\GetAutoPilot.CMD</code> helper runs from the technician USB
+              without internet access and saves the CSV in the <code>GetAutoPilot</code> folder.
             </div>
           </section>
 
@@ -677,7 +684,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                   <tr>
                     <td><code>Run-HWID.cmd</code></td>
                     <td>Runs the hardware hash capture script.</td>
-                    <td>Calls <code>scripts\Get-WindowsAutoPilotInfo.ps1</code>. Requires internet access, PowerShell Gallery access, and the USB label <code>AUTOPILOTUSB</code>.</td>
+                    <td>Calls <code>scripts\Get-WindowsAutoPilotInfo.ps1</code>. Requires approved Wi-Fi/internet access, PowerShell Gallery access, and the USB label <code>AUTOPILOTUSB</code>.</td>
                   </tr>
                   <tr>
                     <td><code>Run-AutopilotDiagnostics.cmd</code></td>
@@ -687,7 +694,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                   <tr>
                     <td><code>GetAutoPilot\GetAutoPilot.CMD</code></td>
                     <td>Additional second option for hardware hash export.</td>
-                    <td>Custom helper. Saves CSV output to the folder where the helper is executed. It does not upload to Intune or enroll the device.</td>
+                    <td>Custom offline helper. Saves CSV output in the <code>GetAutoPilot</code> folder. It does not upload to Intune or enroll the device.</td>
                   </tr>
                 </tbody>
               </table>
@@ -700,12 +707,12 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </li>
               <li>Confirm the USB root contains <code>safeworkbench-en.cmd</code>, <code>scripts\</code>, <code>GetAutoPilot\</code>, and <code>HardwareIDs\</code>.</li>
               <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>.</li>
-              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.</li>
+              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before running Option A.</li>
               <li>Boot or open Command Prompt on the target laptop.</li>
               <li>Open the technician USB drive.</li>
               <li>Run <code>safeworkbench-en.cmd</code>.</li>
-              <li>Select option <strong>4 - HWID / Autopilot Hash</strong>.</li>
-              <li>If Option A reports no connection to PowerShell Gallery, connect Wi-Fi and run it again. If Wi-Fi is not possible, use Option B.</li>
+              <li>Select option <strong>4 - HWID Option A - Online PowerShell Gallery</strong>.</li>
+              <li>If Wi-Fi cannot be connected or Option A cannot download from PowerShell Gallery, use <strong>B - HWID Option B - Offline GetAutoPilot helper</strong>.</li>
               <li>Confirm that the CSV appears in <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the CSV to the approved Autopilot HWID upload location.</li>
             </ol>
@@ -713,7 +720,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               <summary>
                 <span class="foldout-title">
                   <strong>Option B - additional GetAutoPilot helper</strong>
-                  <small>Second option only. Use Option A unless instructed otherwise.</small>
+                  <small>Offline fallback when Wi-Fi is not available or Option A cannot download.</small>
                 </span>
                 <span class="foldout-action" aria-hidden="true">
                   <span class="closed-label">Show details</span>
@@ -728,12 +735,12 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                     <code>tools\technician-usb</code> to the root of the technician USB.
                   </li>
                   <li>Keep the <code>GetAutoPilot</code> folder at the USB root.</li>
-                  <li>Open the <code>GetAutoPilot</code> folder on the technician USB.</li>
-                  <li>Run <code>GetAutoPilot.CMD</code>.</li>
+                  <li>Run <code>safeworkbench-en.cmd</code> and select <strong>B - HWID Option B - Offline GetAutoPilot helper</strong>, or open the <code>GetAutoPilot</code> folder and run <code>GetAutoPilot.CMD</code> directly.</li>
                   <li>The helper runs its local <code>Get-WindowsAutoPilotInfo.ps1</code> script.</li>
+                  <li>It does not need internet access.</li>
                   <li>The CSV is saved in the same <code>GetAutoPilot</code> folder.</li>
                   <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
-                  <li>Use this as a second option when you want a direct local CSV export instead of the standard workbench HWID flow. This does not upload to Intune or enroll the device.</li>
+                  <li>Use this when Option A cannot run because Wi-Fi is not available or the PowerShell Gallery download fails. This does not upload to Intune or enroll the device.</li>
                 </ol>
               </div>
             </details>

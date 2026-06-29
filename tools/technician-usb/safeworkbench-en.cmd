@@ -22,7 +22,8 @@ echo.
 echo 1 - Shutdown PC
 echo 2 - Restart PC
 echo 3 - SAFE Wipe DISK 0
-echo 4 - HWID / Autopilot Hash
+echo 4 - HWID Option A - Online PowerShell Gallery
+echo B - HWID Option B - Offline GetAutoPilot helper
 echo 5 - Autopilot Diagnostics
 echo 6 - Open DiskPart
 echo 7 - Open PowerShell
@@ -36,12 +37,13 @@ echo.
 
 set "option="
 echo ============================================================
-set /p option=Select an option: 
+set /p "option=Select an option: "
 
 if /i "%option%"=="1" goto shutdown
 if /i "%option%"=="2" goto restart
 if /i "%option%"=="3" goto wipe
 if /i "%option%"=="4" goto hwid
+if /i "%option%"=="B" goto hwid_offline
 if /i "%option%"=="5" goto diagnostics
 if /i "%option%"=="6" goto diskpart
 if /i "%option%"=="7" goto powershell
@@ -102,7 +104,7 @@ echo ********************************************
 echo.
 
 set "confirm="
-set /p confirm=Type ERASE to continue: 
+set /p "confirm=Type ERASE to continue: "
 
 if /i not "%confirm%"=="ERASE" (
     echo.
@@ -123,12 +125,15 @@ goto menu
 
 REM END: WIPE
 
-REM START: HWID - Generates Autopilot hash
+REM START: HWID - Generates Autopilot hash with online PowerShell Gallery workflow
 :hwid
 cls
 echo =====================================
-echo      HWID / AUTOPILOT HASH
+echo      HWID OPTION A - ONLINE
 echo =====================================
+echo.
+echo Requires approved Wi-Fi and internet access.
+echo Downloads Get-WindowsAutopilotInfo from PowerShell Gallery.
 echo.
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\Get-WindowsAutoPilotInfo.ps1"
@@ -138,6 +143,31 @@ pause
 goto menu
 
 REM END: HWID
+
+REM START: HWID OFFLINE - Generates Autopilot hash with local GetAutoPilot helper
+:hwid_offline
+cls
+echo =====================================
+echo      HWID OPTION B - OFFLINE HELPER
+echo =====================================
+echo.
+echo Runs GetAutoPilot\GetAutoPilot.CMD from the technician USB.
+echo The CSV is saved in the GetAutoPilot folder.
+echo.
+
+if not exist "%~dp0GetAutoPilot\GetAutoPilot.CMD" (
+    echo ERROR: GetAutoPilot\GetAutoPilot.CMD was not found.
+    echo Keep the GetAutoPilot folder at the USB root.
+    echo.
+    pause
+    goto menu
+)
+
+call "%~dp0GetAutoPilot\GetAutoPilot.CMD"
+
+goto menu
+
+REM END: HWID OFFLINE
 
 REM START: DIAGNOSTICS - Runs Autopilot diagnostics
 :diagnostics
