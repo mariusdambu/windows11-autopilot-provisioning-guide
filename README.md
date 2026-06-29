@@ -40,9 +40,10 @@ Command blocks also include **Copy** buttons for one-click command copying.
 - Technician USB tools are included under `tools/technician-usb`.
 - `safeworkbench-en.cmd` is recommended for technicians because it asks for confirmation before wiping Disk 0.
 - `GetAutoPilot/GetAutoPilot.CMD` is included as an additional second option for local hardware hash export.
-- Manual DISM examples follow the `mariusdambu/Lab_Win11` folder convention:
+- Manual DISM examples follow the `mariusdambu/Lab_Win11` payload folder convention:
   `C:\Lab_Win11\Trabajo\ISOs`, `C:\Lab_Win11\Trabajo\images`,
   `C:\Lab_Win11\Trabajo\Drivers`, and `C:\Lab_Win11\Trabajo\packages`.
+  The guide uses `C:\Lab_Win11\Trabajo\Mount` only as an empty temporary DISM mount folder.
 - Command blocks wrap on screen and in print so long DISM commands remain visible while still copying correctly with the Copy button.
 - Keep any internal version containing real tenant names, support contacts, or network paths in a private location.
 
