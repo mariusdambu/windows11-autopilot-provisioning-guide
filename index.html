@@ -175,12 +175,12 @@ C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
             <div class="callout note">
               <strong>Folder rule:</strong> keep real working files in the four folders above.
               DISM still needs an empty temporary mount folder; for manual commands use
-              <code>C:\Lab_Win11\Trabajo\Mount</code> and keep it empty before mounting.
+              <code>C:\Lab_Win11\Trabajo\offline</code> and keep it empty before mounting.
             </div>
 
             <h3>Mount the install.wim</h3>
             <pre><code>dism /Get-WimInfo /WimFile:"C:\Lab_Win11\Trabajo\images\install.wim"
-dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 /MountDir:"C:\Lab_Win11\Trabajo\Mount" /CheckIntegrity</code></pre>
+dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 /MountDir:"C:\Lab_Win11\Trabajo\offline" /CheckIntegrity</code></pre>
             <div class="callout note">
               <strong>Index check:</strong> Windows 11 Pro is usually index 6.
               Always confirm the correct index with <code>/Get-WimInfo</code> before mounting.
@@ -196,17 +196,17 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             <p>Place the downloaded model-specific drivers in a folder, for example:</p>
             <pre><code>C:\Lab_Win11\Trabajo\Drivers\T14</code></pre>
             <p>Inject the drivers into the mounted image:</p>
-            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\Mount" /Add-Driver /Driver:"C:\Lab_Win11\Trabajo\Drivers\T14" /Recurse</code></pre>
+            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Driver /Driver:"C:\Lab_Win11\Trabajo\Drivers\T14" /Recurse</code></pre>
 
             <h3>Optional packages</h3>
             <p>
               If approved CAB or MSU packages are required, place them under
               <code>C:\Lab_Win11\Trabajo\packages</code> and add them from there.
             </p>
-            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\Mount" /Add-Package /PackagePath:"C:\Lab_Win11\Trabajo\packages"</code></pre>
+            <pre><code>dism /Image:"C:\Lab_Win11\Trabajo\offline" /Add-Package /PackagePath:"C:\Lab_Win11\Trabajo\packages"</code></pre>
 
             <h3>Commit and unmount</h3>
-            <pre><code>dism /Unmount-Image /MountDir:"C:\Lab_Win11\Trabajo\Mount" /Commit /CheckIntegrity</code></pre>
+            <pre><code>dism /Unmount-Image /MountDir:"C:\Lab_Win11\Trabajo\offline" /Commit /CheckIntegrity</code></pre>
 
             <h3>Create the bootable ISO</h3>
             <p>
