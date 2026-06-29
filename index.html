@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Windows 11 Autopilot ISO - Provisioning Procedure</title>
+    <meta name="author" content="Marius Dambu">
+    <meta
+      name="description"
+      content="English HTML procedure for building and using a Windows 11 Autopilot ISO for enterprise provisioning."
+    >
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand" aria-label="Autopilot provisioning guide">
+          <span class="brand-mark">IT</span>
+          <span>Windows 11 Autopilot Provisioning</span>
+        </div>
+        <div class="actions">
+          <button class="print-button" type="button" data-print>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9V2h12v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 14h12v8H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Print
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Enterprise technician procedure</p>
+        <h1>Windows 11 Autopilot ISO - Provisioning Procedure</h1>
+        <p class="subtitle">
+          A practical English guide for creating a Windows 11 Autopilot installation USB,
+          pre-provisioning a laptop, validating the user setup, and handling older devices
+          that require a hardware hash import.
+        </p>
+        <div class="meta-row" aria-label="Document metadata">
+          <span class="pill">HTML guide</span>
+          <span class="pill">DISM and Autopilot</span>
+          <span class="pill">Author: Marius Dambu</span>
+        </div>
+      </section>
+
+      <section class="notice-grid" aria-label="Critical rules">
+        <article class="notice warning">
+          <h2>Network rule</h2>
+          <p>
+            Never install or provision the laptop on the corporate network. Use a free Wi-Fi
+            network or an approved guest Wi-Fi during provisioning.
+          </p>
+        </article>
+        <article class="notice">
+          <h2>User access rule</h2>
+          <p>
+            Before connecting the user's account, confirm that the user is in the required
+            Autopilot user groups defined by your organization.
+          </p>
+        </article>
+        <article class="notice success">
+          <h2>After success</h2>
+          <p>
+            When the device and user setup are complete, remove the computer account from the
+            temporary corporate Wi-Fi exclusion group in Intune.
+          </p>
+        </article>
+      </section>
+
+      <div class="layout">
+        <nav class="toc" aria-label="Table of contents">
+          <h2>Contents</h2>
+          <ol>
+            <li><a href="#scope">Scope</a></li>
+            <li><a href="#before-start">Before you start</a></li>
+            <li><a href="#dism">Build the ISO with DISM</a></li>
+            <li><a href="#usb">Create the USB</a></li>
+            <li><a href="#install">Install Windows</a></li>
+            <li><a href="#oobe">OOBE and Autopilot</a></li>
+            <li><a href="#post-setup">Post-setup tasks</a></li>
+            <li><a href="#hardware-hash">Older laptops and HWID</a></li>
+            <li><a href="#usb-tools">Technician USB tools</a></li>
+          </ol>
+        </nav>
+
+        <div class="content">
+          <section class="section" id="scope">
+            <h2>1. Scope</h2>
+            <p>
+              This procedure is intended for technicians preparing organization-managed laptops with a Windows
+              11 Autopilot ISO. It covers the original DISM-based workflow, the installation
+              screens, the Autopilot pre-provisioning flow, and the supporting
+              technician USB scripts used to collect hardware hashes and run diagnostics.
+            </p>
+            <p>
+              The expected end state is a Windows 11 laptop that has completed Autopilot
+              pre-provisioning, has been resealed, and is ready for the assigned user to sign in
+              with MFA.
+            </p>
+          </section>
+
+          <section class="section" id="before-start">
+            <h2>2. Before you start</h2>
+
+            <h3>Required downloads and tools</h3>
+            <ul>
+              <li>
+                Download the latest official Windows 11 ISO from Microsoft:
+                <a href="https://www.microsoft.com/software-download/windows11">Windows 11 download</a>.
+              </li>
+              <li>
+                Use a Windows technician PC with administrator rights. DISM is included with Windows
+                and is normally enough for mounting images, injecting drivers, and committing the WIM.
+              </li>
+              <li>
+                Install Windows ADK only if you need ADK-specific tools such as <code>oscdimg</code>,
+                WinPE media creation, or other deployment tooling:
+                <a href="https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install">ADK installation guide</a>.
+              </li>
+              <li>Use only vendor drivers. Do not inject apps, scripts, language packs, or modified ISO content into the base image.</li>
+            </ul>
+
+            <div class="callout warning">
+              <strong>Do not use corporate network access during provisioning.</strong>
+              Use a free Wi-Fi connection or an approved guest Wi-Fi. Do not use corporate Wi-Fi,
+              a corporate wired network, or any network path that would make the laptop join internal
+              resources before Autopilot has completed.
+            </div>
+
+            <h3>User and portal checks</h3>
+            <p>
+              Before connecting the user's account during OOBE, verify in Azure that the user is a
+              member of both required groups. Replace the placeholders below with the approved
+              internal group names for your tenant:
+            </p>
+            <ul>
+              <li><code>&lt;Autopilot all-users group&gt;</code></li>
+              <li><code>&lt;Regional Autopilot users group&gt;</code></li>
+            </ul>
+            <p>
+              Azure portal:
+              <a href="https://portal.azure.com">https://portal.azure.com</a>
+            </p>
+            <p>
+              Intune admin center:
+              <a href="https://intune.microsoft.com">https://intune.microsoft.com</a>
+            </p>
+          </section>
+
+          <section class="section" id="dism">
+            <h2>3. Build the ISO with DISM</h2>
+            <p>
+              Engineers can manually build the image using DISM. The example below uses a Lenovo T14 driver folder, but the same pattern applies
+              to other supported models.
+            </p>
+
+            <h3>Extract the Windows ISO</h3>
+            <p>Mount or extract the Windows 11 ISO, then copy all contents to a working folder.</p>
+            <pre><code>C:\ISO\Win11</code></pre>
+
+            <h3>Mount the install.wim</h3>
+            <pre><code>dism /Get-WimInfo /WimFile:C:\ISO\Win11\sources\install.wim
+dism /Mount-Wim /WimFile:C:\ISO\Win11\sources\install.wim /Index:6 /MountDir:C:\Mount</code></pre>
+            <div class="callout note">
+              <strong>Index check:</strong> Windows 11 Pro is usually index 6.
+              Always confirm the correct index with <code>/Get-WimInfo</code> before mounting.
+            </div>
+
+            <h3>Inject vendor drivers</h3>
+            <p>
+              The technician is responsible for identifying the exact laptop model, finding the
+              correct official driver pack, downloading it, and using it for the image. Use the
+              vendor's official support site, for example Lenovo Support for Lenovo models, Dell
+              Support for Dell models, HP Support for HP models, and so on.
+            </p>
+            <p>Place the downloaded model-specific drivers in a folder, for example:</p>
+            <pre><code>C:\Drivers\T14</code></pre>
+            <p>Inject the drivers into the mounted image:</p>
+            <pre><code>dism /Image:C:\Mount /Add-Driver /Driver:C:\Drivers\T14 /Recurse</code></pre>
+
+            <h3>Commit and unmount</h3>
+            <pre><code>dism /Unmount-Wim /MountDir:C:\Mount /Commit</code></pre>
+
+            <h3>Create the bootable ISO</h3>
+            <p>
+              If you need to generate a new ISO file, use <code>oscdimg</code>. This tool is part of
+              the Windows ADK Deployment Tools.
+            </p>
+            <pre><code>oscdimg -bC:\ISO\Win11\boot\etfsboot.com -u2 -h -m -lWIN11_AUTO C:\ISO\Win11 C:\ISO\Win11_Autopilot.iso</code></pre>
+
+            <h3>Simpler automation option</h3>
+            <div class="callout success">
+              <strong>Recommended simpler path:</strong>
+              for most technicians, the fastest and least error-prone option is to automate the DISM
+              workflow and ISO generation with
+              <a href="https://github.com/mariusdambu/Lab_Win11">mariusdambu/Lab_Win11</a>.
+              Use the manual DISM commands when you need full control or when automation is not
+              available.
+            </div>
+          </section>
+
+          <section class="section" id="usb">
+            <h2>4. Create the bootable USB</h2>
+            <p>
+              Create a bootable USB with Rufus, selecting the modified Windows files or ISO.
+              If preparing the disk manually, use PowerShell and confirm the disk number first.
+            </p>
+            <div class="callout note">
+              <strong>USB recommendation:</strong> use a pendrive of at least 16 GB. A USB 3.0 or
+              faster drive is strongly recommended to reduce copy and installation time.
+            </div>
+            <pre><code>Get-Disk
+pause
+Clear-Disk -Number 5 -RemoveData -RemoveOEM
+Set-Disk -Number 5 -PartitionStyle GPT
+New-Partition -DiskNumber 5 -Size 2048MB -AssignDriveLetter | Format-Volume -FileSystem FAT32
+New-Partition -DiskNumber 5 -UseMaximumSize -AssignDriveLetter | Format-Volume -FileSystem exFAT
+pause</code></pre>
+
+            <h3>Required partition structure</h3>
+            <p>
+              Use two partitions. The first partition is only the UEFI boot starter. The second
+              partition contains the full Windows setup content. Microsoft documents FAT32 as the
+              default WinPE/UEFI boot format and calls out the 4 GB FAT32 file-size limit for Windows
+              images; this guide keeps the boot partition FAT32 and uses exFAT for the larger data
+              partition so technicians can copy files easily from Windows or macOS.
+            </p>
+            <p>
+              Microsoft references:
+              <a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/winpe-create-usb-bootable-drive?view=windows-11">Create bootable Windows PE media</a>
+              and
+              <a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/winpe--use-a-single-usb-key-for-winpe-and-a-wim-file---wim?view=windows-11">Use a multi-partition USB deployment drive</a>.
+            </p>
+            <div class="callout warning">
+              <strong>Do not copy the full <code>sources</code> folder to the FAT32 partition.</strong>
+              The FAT32 partition should only contain <code>sources\boot.wim</code>. Put the full
+              <code>sources</code> folder, including the large Windows image file, on the exFAT
+              partition.
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Partition</th>
+                    <th>Purpose</th>
+                    <th>Copy exactly this content</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>FAT32</td>
+                    <td>Boot partition. This is what the laptop firmware starts from.</td>
+                    <td>
+                      <code>boot\</code><br>
+                      <code>efi\</code><br>
+                      <code>sources\boot.wim</code> only<br>
+                      <code>bootmgr</code><br>
+                      <code>bootmgr.efi</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>exFAT</td>
+                    <td>Windows setup data partition. This holds the full installer and large image files.</td>
+                    <td>
+                      <code>boot\</code><br>
+                      <code>efi\</code><br>
+                      <code>sources\</code> full folder<br>
+                      <code>support\</code><br>
+                      <code>autorun.inf</code><br>
+                      <code>bootmgr</code><br>
+                      <code>bootmgr.efi</code><br>
+                      <code>setup.exe</code>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" id="install">
+            <h2>5. Install Windows from USB</h2>
+            <ol>
+              <li>Boot the laptop from the USB device. On Lenovo devices, press <strong>F12</strong> for the boot menu.</li>
+              <li>Select the USB boot device.</li>
+              <li>Choose the language, regional format, and keyboard layout required for the deployment.</li>
+              <li>Select <strong>Install Windows 11</strong> and acknowledge that files, apps, and settings will be deleted.</li>
+              <li>Accept the Microsoft software license terms.</li>
+              <li>
+                Before selecting the installation target, wipe the internal disk if the laptop must
+                start from a clean state. Use DiskPart <code>clean</code>, the workbench wipe option,
+                or the Windows Setup delete partitions option.
+              </li>
+              <li>Use DiskPart or the setup UI to clean/select the installation disk as required.</li>
+              <li>Select the target partition and start the Windows installation.</li>
+            </ol>
+
+            <div class="callout warning">
+              <strong>Disk wipe warning:</strong> verify the disk number before running
+              <code>clean</code> or <code>Clear-Disk</code>. These actions destroy data.
+            </div>
+
+            <div class="image-grid">
+              <figure>
+                <img src="assets/img/01-boot-menu.jpg" alt="Lenovo boot menu with USB HDD selected">
+                <figcaption>Boot from the USB device using the Lenovo boot menu.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/02-language-settings.jpg" alt="Windows 11 language settings screen">
+                <figcaption>Select the Windows installation language and regional format.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/03-keyboard-settings.jpg" alt="Windows 11 keyboard settings screen">
+                <figcaption>Select the required keyboard layout.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/04-setup-option.jpg" alt="Windows 11 setup option screen">
+                <figcaption>Select Install Windows 11 and confirm the data deletion warning.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/05-license-terms.jpg" alt="Windows software license terms screen">
+                <figcaption>Accept the Microsoft software license terms.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/06-diskpart-clean.jpg" alt="DiskPart clean command completed">
+                <figcaption>Optional DiskPart clean workflow before selecting the installation disk.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/07-select-install-location.jpg" alt="Windows 11 disk selection screen">
+                <figcaption>Select the target disk or partition for Windows 11.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/08-ready-to-install.jpg" alt="Windows 11 ready to install screen">
+                <figcaption>Start the Windows installation.</figcaption>
+              </figure>
+            </div>
+          </section>
+
+          <section class="section" id="oobe">
+            <h2>6. OOBE and Autopilot pre-provisioning</h2>
+            <ol>
+              <li>Complete the country/region and keyboard screens.</li>
+              <li>When asked for a network, connect only to a free Wi-Fi network or an approved guest Wi-Fi.</li>
+              <li>When the work or school setup screen appears, confirm the user has the required Azure group memberships before continuing.</li>
+              <li class="highlight-step">
+                At OOBE, press the Windows key
+                <span class="inline-keycap" aria-label="Windows key">⊞</span>
+                <strong>five times</strong> to open the provisioning options.
+              </li>
+              <li>Select <strong>Pre-provision with Windows Autopilot</strong>, then select <strong>Next</strong>.</li>
+              <li>Wait until all profiles, policies, and applications finish installing.</li>
+              <li>When the completion screen appears, select <strong>Reseal</strong>.</li>
+              <li>The device reboots to the login screen. Ask the user to sign in with their corporate email and password, with Authenticator ready for MFA.</li>
+            </ol>
+
+            <div class="callout note">
+              <strong>Command Prompt shortcut:</strong> at the first Windows setup screen, press
+              <code>Shift + F10</code>. On laptops where the function row requires the Fn modifier,
+              press <code>Fn + Shift + F10</code>.
+            </div>
+
+            <div class="image-grid">
+              <figure>
+                <img src="assets/img/09-region-selection.jpg" alt="OOBE country and region selection">
+                <figcaption>Select the appropriate country or region.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/10-keyboard-layout.jpg" alt="OOBE keyboard layout selection">
+                <figcaption>Select the right keyboard layout.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/11-second-keyboard-layout.jpg" alt="OOBE second keyboard layout prompt">
+                <figcaption>Skip the second keyboard layout unless required.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/15-provisioning-options.jpg" alt="Autopilot provisioning options screen">
+                <figcaption>Open the provisioning menu from OOBE.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/16-pre-provision-selected.jpg" alt="Pre-provision with Windows Autopilot selected">
+                <figcaption>Select Pre-provision with Windows Autopilot.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/17-pre-provision-details-redacted.jpg" alt="Pre-provision details screen with tenant and QR redacted">
+                <figcaption>Confirm the Autopilot profile details. Tenant, profile, and QR information are redacted in this public-safe image.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/18-provisioning-progress.jpg" alt="Autopilot setting up for work or school progress screen">
+                <figcaption>Wait for Device preparation, Device setup, and Account setup to complete.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/img/19-setup-complete-redacted.jpg" alt="Autopilot setup complete screen with tenant details redacted">
+                <figcaption>Select Reseal when setup is complete. Tenant and profile information are redacted in this image.</figcaption>
+              </figure>
+            </div>
+          </section>
+
+          <section class="section" id="post-setup">
+            <h2>7. Post-setup validation and Intune task</h2>
+            <p>After the user signs in and MFA is complete, validate the laptop before handing it over.</p>
+            <ul class="checklist">
+              <li>The required security client is installed and connected.</li>
+              <li>The device management portal is installed, the user is signed in, and the device is compliant.</li>
+              <li>The required productivity apps are installed and the mail profile is syncing.</li>
+              <li>The printer is installed and printing.</li>
+              <li>Network drives are mapped and accessible.</li>
+              <li>All required applications open correctly.</li>
+              <li>Quick Assist or Remote Help is present.</li>
+              <li>Access to company resources is confirmed.</li>
+              <li>No enrollment or compliance errors are visible.</li>
+            </ul>
+
+            <h3>Enable corporate Wi-Fi after successful setup</h3>
+            <ol>
+              <li>Go to Intune: <a href="https://intune.microsoft.com">https://intune.microsoft.com</a>.</li>
+              <li>Search for the group <code>&lt;Temporary corporate Wi-Fi exclusion group&gt;</code>.</li>
+              <li>Remove the computer account from that group's members.</li>
+              <li>Confirm that the laptop can now use the corporate Wi-Fi.</li>
+            </ol>
+            <p>
+              If you do not have permissions, ask the approved endpoint engineering support
+              channel for help.
+            </p>
+          </section>
+
+          <section class="section" id="hardware-hash">
+            <h2>8. Older laptops and hardware hash capture</h2>
+            <p>
+              Some older laptops are not enrolled in Autopilot by default. Before requesting
+              enrollment, collect the device hardware hash and upload the CSV file to the required
+              location.
+            </p>
+
+            <h3>Required HWID process</h3>
+            <ol>
+              <li>Prepare the technician USB.</li>
+              <li>
+                Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>. The script searches
+                for this label; if it is wrong, the CSV will not be copied back to the USB correctly.
+              </li>
+              <li>Run <code>Run-HWID.cmd</code> or option 4 from <code>safeworkbench-en.cmd</code>.</li>
+              <li>The script creates <code>C:\HWID</code>, installs/runs <code>Get-WindowsAutopilotInfo</code>, and exports a CSV.</li>
+              <li>When the USB label is correct, the file is copied to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
+              <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot HWID upload path&gt;</code>.</li>
+              <li>Then contact the approved endpoint engineering support channel to request Autopilot enrollment.</li>
+            </ol>
+
+            <div class="callout note">
+              The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow uses PowerShell Gallery
+              and therefore needs internet access. The <code>GetAutoPilot\GetAutoPilot.CMD</code>
+              helper uses a local script and is designed for offline CSV export to its own folder.
+            </div>
+          </section>
+
+          <section class="section" id="usb-tools">
+            <h2>9. Technician USB tools reference</h2>
+            <p>
+              This project includes the technician USB tools under
+              <code>tools\technician-usb</code>. Copy the contents of that folder to the root of the
+              technician USB and keep the folder structure exactly as provided.
+            </p>
+            <ol>
+              <li>Copy everything inside <code>tools\technician-usb</code> to the root of the USB.</li>
+              <li>Keep the <code>scripts</code> and <code>GetAutoPilot</code> folders next to the CMD files.</li>
+              <li>Create a folder called <code>HardwareIDs</code> at the root of the USB.</li>
+              <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code> before running HWID capture.</li>
+              <li>Run <code>safeworkbench-en.cmd</code> as the preferred menu.</li>
+            </ol>
+            <div class="callout warning">
+              <strong>Disk wipe warning:</strong> option 3 in the workbench wipes Disk 0. Use
+              <code>safeworkbench-en.cmd</code> unless you have a specific reason not to; it requires
+              typing <code>ERASE</code> before the wipe runs.
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>File</th>
+                    <th>Purpose</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>safeworkbench-en.cmd</code></td>
+                    <td>Recommended technician menu.</td>
+                    <td>English UI. Use this first. Adds a shutdown/restart delay and requires typing <code>ERASE</code> before wiping Disk 0.</td>
+                  </tr>
+                  <tr>
+                    <td><code>workbench-en.cmd</code></td>
+                    <td>Standard technician menu.</td>
+                    <td>English UI. Option 3 wipes Disk 0 through <code>clean_disk0.txt</code>; use carefully.</td>
+                  </tr>
+                  <tr>
+                    <td><code>Run-HWID.cmd</code></td>
+                    <td>Runs the hardware hash capture script.</td>
+                    <td>Calls <code>scripts\Get-WindowsAutoPilotInfo.ps1</code>. Requires the USB label <code>AUTOPILOTUSB</code> to copy the CSV back to <code>HardwareIDs</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>Run-AutopilotDiagnostics.cmd</code></td>
+                    <td>Runs Autopilot diagnostics.</td>
+                    <td>Calls <code>scripts\Get-AutopilotDiagnosticsCommunity.ps1</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>GetAutoPilot\GetAutoPilot.CMD</code></td>
+                    <td>Additional second option for hardware hash export.</td>
+                    <td>Custom helper. Saves CSV output to the folder where the helper is executed. Use it as an additional local/offline export method when you want a direct CSV export.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>Option A - recommended HWID workflow</h3>
+            <ol>
+              <li>
+                After downloading or cloning this project, copy everything inside
+                <code>tools\technician-usb</code> to the root of the technician USB.
+              </li>
+              <li>Confirm the USB root contains <code>safeworkbench-en.cmd</code>, <code>scripts\</code>, <code>GetAutoPilot\</code>, and <code>HardwareIDs\</code>.</li>
+              <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>.</li>
+              <li>Boot or open Command Prompt on the target laptop.</li>
+              <li>Open the technician USB drive.</li>
+              <li>Run <code>safeworkbench-en.cmd</code>.</li>
+              <li>Select option <strong>4 - HWID / Autopilot Hash</strong>.</li>
+              <li>Confirm that the CSV appears in <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
+              <li>Upload the CSV to the approved Autopilot HWID upload location.</li>
+            </ol>
+            <h3>Option B - additional GetAutoPilot helper</h3>
+            <ol>
+              <li>
+                After downloading or cloning this project, copy everything inside
+                <code>tools\technician-usb</code> to the root of the technician USB.
+              </li>
+              <li>Keep the <code>GetAutoPilot</code> folder at the USB root.</li>
+              <li>Open the <code>GetAutoPilot</code> folder on the technician USB.</li>
+              <li>Run <code>GetAutoPilot.CMD</code>.</li>
+              <li>The helper runs its local <code>Get-WindowsAutoPilotInfo.ps1</code> script.</li>
+              <li>The CSV is saved in the same <code>GetAutoPilot</code> folder.</li>
+              <li>Use this as a second option when you want a direct local export instead of the standard workbench HWID flow.</li>
+            </ol>
+            <h3>Included tool folder layout</h3>
+            <pre><code>tools\technician-usb
+  safeworkbench-en.cmd
+  workbench-en.cmd
+  Run-HWID.cmd
+  Run-AutopilotDiagnostics.cmd
+  clean_disk0.txt
+  scripts\
+    Get-WindowsAutoPilotInfo.ps1
+    Get-AutopilotDiagnosticsCommunity.ps1
+    read_me.txt
+  GetAutoPilot\
+    GetAutoPilot.CMD
+    Get-WindowsAutoPilotInfo.ps1</code></pre>
+          </section>
+
+        </div>
+      </div>
+
+      <footer class="footer">
+        <p>Windows 11 Autopilot ISO provisioning procedure for enterprise technicians.</p>
+      </footer>
+    </main>
+
+    <script src="assets/js/print.js"></script>
+  </body>
+</html>
