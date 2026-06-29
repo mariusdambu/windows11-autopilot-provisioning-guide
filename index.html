@@ -160,6 +160,12 @@
               The example driver folder uses a Lenovo T14, but the same pattern applies to other
               supported models.
             </p>
+            <div class="callout note">
+              <strong>This driver-injection step is optional.</strong>
+              Technicians can use the original Windows 11 ISO or USB. If Wi-Fi drivers are not
+              injected, Windows may not detect the laptop Wi-Fi adapter during setup or OOBE, so
+              the technician may need to load or install the correct Wi-Fi driver manually.
+            </div>
 
             <h3>Prepare the Lab_Win11 folders</h3>
             <p>
@@ -177,6 +183,38 @@ C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
               DISM still needs an empty temporary mount folder; for manual commands use
               <code>C:\Lab_Win11\Trabajo\offline</code> and keep it empty before mounting.
             </div>
+
+            <h3>Copy the Windows image files from the ISO</h3>
+            <p>
+              Put the original Windows 11 ISO in <code>C:\Lab_Win11\Trabajo\ISOs</code>, then mount
+              it in Windows. In the mounted ISO, open the <code>sources</code> folder and copy the
+              image files to <code>C:\Lab_Win11\Trabajo\images</code>.
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>From mounted Windows ISO</th>
+                    <th>Copy to Lab_Win11</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>sources\boot.wim</code></td>
+                    <td><code>C:\Lab_Win11\Trabajo\images\boot.wim</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>sources\install.wim</code>, <code>install.esd</code>, or all <code>install*.swm</code> files</td>
+                    <td><code>C:\Lab_Win11\Trabajo\images\</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              The manual commands below assume <code>install.wim</code>. If the ISO contains
+              <code>install.esd</code> or split <code>install*.swm</code> files, use the Lab_Win11
+              helper flow to prepare the working image, or adjust the DISM commands accordingly.
+            </p>
 
             <h3>Mount the install.wim</h3>
             <pre><code>dism /Get-WimInfo /WimFile:"C:\Lab_Win11\Trabajo\images\install.wim"
@@ -207,6 +245,27 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
 
             <h3>Commit and unmount</h3>
             <pre><code>dism /Unmount-Image /MountDir:"C:\Lab_Win11\Trabajo\offline" /Commit /CheckIntegrity</code></pre>
+
+            <h3>After injecting drivers</h3>
+            <p>
+              After committing the image, rebuild the deployment media before installing Windows.
+              Use one of these two paths:
+            </p>
+            <ul>
+              <li>
+                <strong>ISO path:</strong> use the Lab_Win11 ISO creation option. It uses the base
+                ISO from <code>Trabajo\ISOs</code>, the updated images from
+                <code>Trabajo\images</code>, and writes the final ISO back to
+                <code>Trabajo\ISOs</code>.
+              </li>
+              <li>
+                <strong>USB path:</strong> recreate or update the bootable USB. Replace
+                <code>sources\boot.wim</code> on the FAT32 boot partition with
+                <code>Trabajo\images\boot.wim</code>. Replace the install image in the exFAT
+                partition's <code>sources</code> folder with the updated
+                <code>Trabajo\images\install.wim</code> or equivalent <code>install.*</code> files.
+              </li>
+            </ul>
 
             <h3>Create the bootable ISO</h3>
             <p>

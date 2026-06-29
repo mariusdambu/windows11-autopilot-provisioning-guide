@@ -44,6 +44,8 @@ Command blocks also include **Copy** buttons for one-click command copying.
   `C:\Lab_Win11\Trabajo\ISOs`, `C:\Lab_Win11\Trabajo\images`,
   `C:\Lab_Win11\Trabajo\Drivers`, and `C:\Lab_Win11\Trabajo\packages`.
   The guide uses `C:\Lab_Win11\Trabajo\offline` as the temporary DISM mount folder.
+- The guide explains where to copy `sources\boot.wim` and `sources\install.*` from the mounted
+  Windows ISO, and how to rebuild either the ISO or the USB after driver injection.
 - Command blocks wrap on screen and in print so long DISM commands remain visible while still copying correctly with the Copy button.
 - Keep any internal version containing real tenant names, support contacts, or network paths in a private location.
 
