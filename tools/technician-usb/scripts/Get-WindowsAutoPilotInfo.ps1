@@ -49,7 +49,7 @@ function Test-PowerShellGallery {
 
 Write-Line
 Write-Line "============================================================"
-Write-Line "        Autopilot hardware hash capture - Option A"
+Write-Line "        Hardware hash file capture - recommended method"
 Write-Line "============================================================"
 Write-Line
 Write-Info "This option requires internet access to PowerShell Gallery."
@@ -66,7 +66,7 @@ $localCsv = Join-Path $workFolder "$safeSerial-HWID.csv"
 
 $usbDrive = Get-Volume | Where-Object { $_.FileSystemLabel -eq $usbLabel } | Select-Object -First 1
 if (-not $usbDrive) {
-    Write-ProblemAndExit "USB volume label '$usbLabel' not found. Rename the technician USB to '$usbLabel' and run Option A again." 3
+    Write-ProblemAndExit "USB volume label '$usbLabel' not found. Rename the technician USB to '$usbLabel' and run option 4 again." 3
 }
 
 $usbPath = $usbDrive.DriveLetter + ":\"
@@ -88,10 +88,10 @@ if (-not (Test-PowerShellGallery)) {
     Write-Problem "No connection to PowerShell Gallery was detected."
     Write-Line
     Write-Line "Connect the laptop to an approved Wi-Fi or approved non-corporate network,"
-    Write-Line "then run Option A / option 4 again from safeworkbench-en.cmd."
+    Write-Line "then run option 4 again from safeworkbench-en.cmd."
     Write-Line
-    Write-Line "If Wi-Fi cannot be connected at this stage, use Option B:"
-    Write-Line "GetAutoPilot\GetAutoPilot.CMD"
+    Write-Line "If Wi-Fi cannot be connected at this stage, use option 5:"
+    Write-Line "Create hardware hash file (offline fallback)"
     exit 10
 }
 Write-Ok "PowerShell Gallery is reachable."
@@ -108,9 +108,9 @@ try {
 } catch {
     Write-Problem "Get-WindowsAutopilotInfo could not be installed."
     Write-Line
-    Write-Line "Check the Wi-Fi connection and internet access, then run Option A again."
-    Write-Line "If the script still cannot be downloaded, use Option B:"
-    Write-Line "GetAutoPilot\GetAutoPilot.CMD"
+    Write-Line "Check the Wi-Fi connection and internet access, then run option 4 again."
+    Write-Line "If the script still cannot be downloaded, use option 5:"
+    Write-Line "Create hardware hash file (offline fallback)"
     Write-Line
     Write-Problem $_.Exception.Message
     exit 11
@@ -132,7 +132,7 @@ try {
     Write-Ok "CSV generated: $localCsv"
     Write-Ok "CSV copied to USB: $destinationFile"
     Write-Line
-    Write-Line "Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged."
+    Write-Line "Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged."
     Write-Line "This script did not upload anything to Intune."
 } catch {
     Write-ProblemAndExit "CSV generation or USB copy failed. $($_.Exception.Message)" 13

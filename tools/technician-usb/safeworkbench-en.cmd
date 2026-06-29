@@ -22,13 +22,13 @@ echo.
 echo 1 - Shutdown PC
 echo 2 - Restart PC
 echo 3 - SAFE Wipe DISK 0
-echo 4 - HWID Option A - Online PowerShell Gallery
-echo B - HWID Option B - Offline GetAutoPilot helper
-echo 5 - Autopilot Diagnostics
-echo 6 - Open DiskPart
-echo 7 - Open PowerShell
-echo 8 - Show Disk Information
-echo 9 - Show Network / IP
+echo 4 - Create hardware hash file (recommended - Wi-Fi)
+echo 5 - Create hardware hash file (offline fallback)
+echo 6 - Autopilot Diagnostics
+echo 7 - Open DiskPart
+echo 8 - Open PowerShell
+echo 9 - Show Disk Information
+echo N - Show Network / IP
 echo S - Show Serial Number
 echo W - Open WiFi Settings
 echo 0 - New CMD Window
@@ -43,12 +43,12 @@ if /i "%option%"=="1" goto shutdown
 if /i "%option%"=="2" goto restart
 if /i "%option%"=="3" goto wipe
 if /i "%option%"=="4" goto hwid
-if /i "%option%"=="B" goto hwid_offline
-if /i "%option%"=="5" goto diagnostics
-if /i "%option%"=="6" goto diskpart
-if /i "%option%"=="7" goto powershell
-if /i "%option%"=="8" goto disks
-if /i "%option%"=="9" goto network
+if /i "%option%"=="5" goto hwid_offline
+if /i "%option%"=="6" goto diagnostics
+if /i "%option%"=="7" goto diskpart
+if /i "%option%"=="8" goto powershell
+if /i "%option%"=="9" goto disks
+if /i "%option%"=="N" goto network
 if /i "%option%"=="S" goto serial
 if /i "%option%"=="W" goto wifi
 if /i "%option%"=="0" goto newcmd
@@ -125,11 +125,12 @@ goto menu
 
 REM END: WIPE
 
-REM START: HWID - Generates Autopilot hash with online PowerShell Gallery workflow
+REM START: HWID - Generates hardware hash with online PowerShell Gallery workflow
 :hwid
 cls
 echo =====================================
-echo      HWID OPTION A - ONLINE
+echo      CREATE HARDWARE HASH FILE
+echo      Recommended method - needs Wi-Fi
 echo =====================================
 echo.
 echo Requires approved Wi-Fi and internet access.
@@ -144,11 +145,12 @@ goto menu
 
 REM END: HWID
 
-REM START: HWID OFFLINE - Generates Autopilot hash with local GetAutoPilot helper
+REM START: HWID OFFLINE - Generates hardware hash with local GetAutoPilot helper
 :hwid_offline
 cls
 echo =====================================
-echo      HWID OPTION B - OFFLINE HELPER
+echo      CREATE HARDWARE HASH FILE
+echo      Offline fallback
 echo =====================================
 echo.
 echo Runs GetAutoPilot\GetAutoPilot.CMD from the technician USB.

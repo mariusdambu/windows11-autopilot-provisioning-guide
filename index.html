@@ -82,7 +82,7 @@
             <li><a href="#install">Install Windows</a></li>
             <li><a href="#oobe">OOBE and Autopilot</a></li>
             <li><a href="#post-setup">Post-setup tasks</a></li>
-            <li><a href="#hardware-hash">Older laptops and HWID</a></li>
+            <li><a href="#hardware-hash">Older laptops and hardware hash</a></li>
             <li><a href="#usb-tools">Technician USB tools</a></li>
           </ol>
         </nav>
@@ -608,34 +608,34 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               location.
             </p>
 
-            <h3>Required HWID process</h3>
+            <h3>Required hardware hash process</h3>
             <ol>
               <li>Prepare the technician USB.</li>
               <li>
                 Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>. The script searches
                 for this label; if it is wrong, the CSV will not be copied back to the USB correctly.
               </li>
-              <li>For Option A, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before running the HWID capture.</li>
-              <li>Run <code>Run-HWID.cmd</code> or option <strong>4 - HWID Option A</strong> from <code>safeworkbench-en.cmd</code>.</li>
-              <li>Option A creates <code>C:\HWID</code>, downloads/updates <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, and exports a CSV.</li>
-              <li>If Wi-Fi cannot be connected or the PowerShell Gallery download fails, use <strong>Option B</strong> instead.</li>
-              <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
+              <li>For the recommended method, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before running the hash capture.</li>
+              <li>Run <code>Run-HWID.cmd</code> or select <strong>4 - Create hardware hash file (recommended - Wi-Fi)</strong> from <code>safeworkbench-en.cmd</code>.</li>
+              <li>The recommended method creates <code>C:\HWID</code>, downloads/updates <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, and exports a CSV.</li>
+              <li>If Wi-Fi cannot be connected or the PowerShell Gallery download fails, select <strong>5 - Create hardware hash file (offline fallback)</strong> instead.</li>
+              <li>Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.</li>
               <li>When the USB label is correct, the file is copied to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
-              <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot HWID upload path&gt;</code>.</li>
+              <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot hardware hash upload path&gt;</code>.</li>
               <li>Then follow the approved company escalation matrix to request Autopilot enrollment.</li>
             </ol>
 
             <div class="callout note">
-              <strong>Option A needs internet.</strong>
+              <strong>The recommended method needs internet.</strong>
               The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow downloads or updates
               <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, so the laptop must
               already be connected to an approved Wi-Fi or approved non-corporate network before
               running it. It only generates a
               local CSV and copies it to the USB; it does not upload the CSV to Intune and does not
-              enroll the device. If Wi-Fi cannot be connected or the download fails, use Option B.
+              enroll the device. If Wi-Fi cannot be connected or the download fails, use the offline fallback.
             </div>
             <div class="callout note">
-              <strong>Option B works offline.</strong>
+              <strong>The offline fallback works without internet.</strong>
               The <code>GetAutoPilot\GetAutoPilot.CMD</code> helper runs from the technician USB
               without internet access and saves the CSV in the <code>GetAutoPilot</code> folder.
             </div>
@@ -652,7 +652,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               <li>Copy everything inside <code>tools\technician-usb</code> to the root of the USB.</li>
               <li>Keep the <code>scripts</code> and <code>GetAutoPilot</code> folders next to the CMD files.</li>
               <li>Create a folder called <code>HardwareIDs</code> at the root of the USB.</li>
-              <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code> before running HWID capture.</li>
+              <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code> before running hardware hash capture.</li>
               <li>Run <code>safeworkbench-en.cmd</code> as the preferred menu.</li>
             </ol>
             <div class="callout warning">
@@ -699,7 +699,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                 </tbody>
               </table>
             </div>
-            <h3>Option A - recommended HWID workflow</h3>
+            <h3>Recommended method - create the hardware hash file</h3>
             <ol>
               <li>
                 After downloading or cloning this project, copy everything inside
@@ -707,20 +707,20 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </li>
               <li>Confirm the USB root contains <code>safeworkbench-en.cmd</code>, <code>scripts\</code>, <code>GetAutoPilot\</code>, and <code>HardwareIDs\</code>.</li>
               <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>.</li>
-              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before running Option A.</li>
+              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access before using the recommended method.</li>
               <li>Boot or open Command Prompt on the target laptop.</li>
               <li>Open the technician USB drive.</li>
               <li>Run <code>safeworkbench-en.cmd</code>.</li>
-              <li>Select option <strong>4 - HWID Option A - Online PowerShell Gallery</strong>.</li>
-              <li>If Wi-Fi cannot be connected or Option A cannot download from PowerShell Gallery, use <strong>B - HWID Option B - Offline GetAutoPilot helper</strong>.</li>
+              <li>Select option <strong>4 - Create hardware hash file (recommended - Wi-Fi)</strong>.</li>
+              <li>If Wi-Fi cannot be connected or the PowerShell Gallery download fails, select <strong>5 - Create hardware hash file (offline fallback)</strong>.</li>
               <li>Confirm that the CSV appears in <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
-              <li>Upload the CSV to the approved Autopilot HWID upload location.</li>
+              <li>Upload the CSV to the approved Autopilot hardware hash upload location.</li>
             </ol>
             <details class="foldout compact">
               <summary>
                 <span class="foldout-title">
-                  <strong>Option B - additional GetAutoPilot helper</strong>
-                  <small>Offline fallback when Wi-Fi is not available or Option A cannot download.</small>
+                  <strong>Offline fallback - GetAutoPilot helper</strong>
+                  <small>Use when Wi-Fi is not available or the download fails.</small>
                 </span>
                 <span class="foldout-action" aria-hidden="true">
                   <span class="closed-label">Show details</span>
@@ -735,12 +735,12 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                     <code>tools\technician-usb</code> to the root of the technician USB.
                   </li>
                   <li>Keep the <code>GetAutoPilot</code> folder at the USB root.</li>
-                  <li>Run <code>safeworkbench-en.cmd</code> and select <strong>B - HWID Option B - Offline GetAutoPilot helper</strong>, or open the <code>GetAutoPilot</code> folder and run <code>GetAutoPilot.CMD</code> directly.</li>
+                  <li>Run <code>safeworkbench-en.cmd</code> and select <strong>5 - Create hardware hash file (offline fallback)</strong>, or open the <code>GetAutoPilot</code> folder and run <code>GetAutoPilot.CMD</code> directly.</li>
                   <li>The helper runs its local <code>Get-WindowsAutoPilotInfo.ps1</code> script.</li>
                   <li>It does not need internet access.</li>
                   <li>The CSV is saved in the same <code>GetAutoPilot</code> folder.</li>
-                  <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
-                  <li>Use this when Option A cannot run because Wi-Fi is not available or the PowerShell Gallery download fails. This does not upload to Intune or enroll the device.</li>
+                  <li>Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.</li>
+                  <li>Use this when the recommended method cannot run because Wi-Fi is not available or the PowerShell Gallery download fails. This does not upload to Intune or enroll the device.</li>
                 </ol>
               </div>
             </details>

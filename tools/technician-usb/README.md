@@ -22,16 +22,16 @@ Do not copy the parent project folder itself; copy the files and folders inside 
     +-- Get-WindowsAutoPilotInfo.ps1
 ```
 
-## Before running HWID capture
+## Before running hardware hash capture
 
 1. Rename the USB volume label to exactly `AUTOPILOTUSB`.
 2. Make sure the `HardwareIDs` folder exists at the USB root.
-3. For Option A, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.
+3. For the recommended method, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.
 4. Run `safeworkbench-en.cmd`.
-5. Select option `4 - HWID Option A - Online PowerShell Gallery`.
-6. If Wi-Fi cannot be connected or Option A cannot download from PowerShell Gallery, select `B - HWID Option B - Offline GetAutoPilot helper`.
+5. Select option `4 - Create hardware hash file (recommended - Wi-Fi)`.
+6. If Wi-Fi cannot be connected or the PowerShell Gallery download fails, select `5 - Create hardware hash file (offline fallback)`.
 7. Confirm that the CSV is copied to `HardwareIDs\<Serial>-HWID.csv`.
-8. Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.
+8. Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.
 
 ## Additional GetAutoPilot option
 
@@ -39,9 +39,9 @@ Do not copy the parent project folder itself; copy the files and folders inside 
 It runs the local script in the `GetAutoPilot` folder and saves the CSV output in that same folder.
 It does not upload the CSV to Intune and does not enroll the device.
 
-Use this helper when Wi-Fi cannot be connected or when Option A cannot download
+Use this helper when Wi-Fi cannot be connected or when the recommended method cannot download
 `Get-WindowsAutopilotInfo` from PowerShell Gallery.
-Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.
+Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.
 
 ## Safety warning
 
