@@ -615,8 +615,10 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                 Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>. The script searches
                 for this label; if it is wrong, the CSV will not be copied back to the USB correctly.
               </li>
+              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.</li>
               <li>Run <code>Run-HWID.cmd</code> or option 4 from <code>safeworkbench-en.cmd</code>.</li>
-              <li>The script creates <code>C:\HWID</code>, installs/runs <code>Get-WindowsAutopilotInfo</code>, and exports a CSV.</li>
+              <li>The script creates <code>C:\HWID</code>, installs/runs <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, and exports a CSV.</li>
+              <li>If Option A fails because PowerShell Gallery cannot be reached, connect Wi-Fi and run Option A again. If Wi-Fi cannot be connected at that stage, use Option B instead.</li>
               <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
               <li>When the USB label is correct, the file is copied to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot HWID upload path&gt;</code>.</li>
@@ -624,10 +626,11 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </ol>
 
             <div class="callout note">
-              The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow uses PowerShell Gallery
-              and therefore needs internet access. The <code>GetAutoPilot\GetAutoPilot.CMD</code>
-              helper uses a local script and is designed for local CSV generation to its own folder.
-              It does not upload the CSV to Intune and does not enroll the device.
+              <strong>Option A needs internet.</strong>
+              The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow downloads or updates
+              <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery. It only generates a
+              local CSV and copies it to the USB; it does not upload the CSV to Intune and does not
+              enroll the device. If Option A cannot reach PowerShell Gallery, use Option B.
             </div>
           </section>
 
@@ -674,7 +677,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                   <tr>
                     <td><code>Run-HWID.cmd</code></td>
                     <td>Runs the hardware hash capture script.</td>
-                    <td>Calls <code>scripts\Get-WindowsAutoPilotInfo.ps1</code>. Requires the USB label <code>AUTOPILOTUSB</code> to copy the CSV back to <code>HardwareIDs</code>.</td>
+                    <td>Calls <code>scripts\Get-WindowsAutoPilotInfo.ps1</code>. Requires internet access, PowerShell Gallery access, and the USB label <code>AUTOPILOTUSB</code>.</td>
                   </tr>
                   <tr>
                     <td><code>Run-AutopilotDiagnostics.cmd</code></td>
@@ -697,10 +700,12 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </li>
               <li>Confirm the USB root contains <code>safeworkbench-en.cmd</code>, <code>scripts\</code>, <code>GetAutoPilot\</code>, and <code>HardwareIDs\</code>.</li>
               <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code>.</li>
+              <li>Connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.</li>
               <li>Boot or open Command Prompt on the target laptop.</li>
               <li>Open the technician USB drive.</li>
               <li>Run <code>safeworkbench-en.cmd</code>.</li>
               <li>Select option <strong>4 - HWID / Autopilot Hash</strong>.</li>
+              <li>If Option A reports no connection to PowerShell Gallery, connect Wi-Fi and run it again. If Wi-Fi is not possible, use Option B.</li>
               <li>Confirm that the CSV appears in <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the CSV to the approved Autopilot HWID upload location.</li>
             </ol>
