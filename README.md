@@ -1,6 +1,6 @@
-# Windows 11 Autopilot ISO - Provisioning Procedure
+# Windows 11 Autopilot Provisioning Guide - ISO and USB Workflow
 
-This project contains a portable English HTML version of a Windows 11 Autopilot ISO provisioning procedure for enterprise technicians.
+This project contains a portable English HTML guide for preparing Windows 11 Autopilot ISO and USB provisioning media for enterprise technicians.
 
 Author: Marius Dambu
 
@@ -36,8 +36,8 @@ Command blocks also include **Copy** buttons for one-click command copying.
 
 ## Important notes
 
-- The guide includes Intact-specific operational details requested for technicians.
-- Screenshots were redacted where they contained tenant/profile/QR data or unrelated Wi-Fi SSIDs.
+- This is a public-safe version. Organization-specific group names, support contacts, network names, and internal upload paths are represented with placeholders.
+- Screenshots were redacted or omitted where they contained tenant/profile/QR data, organization names, or Wi-Fi SSIDs.
 - Technician USB tools are included under `tools/technician-usb`.
 - `safeworkbench-en.cmd` is recommended for technicians because it asks for confirmation before wiping Disk 0.
 - `GetAutoPilot/GetAutoPilot.CMD` is included as an additional second option for local hardware hash export.
@@ -48,7 +48,7 @@ Command blocks also include **Copy** buttons for one-click command copying.
 - The guide explains where to copy `sources\boot.wim` and `sources\install.*` from the mounted
   Windows ISO, and how to rebuild either the ISO or the USB after driver injection.
 - Command blocks wrap on screen and in print so long DISM commands remain visible while still copying correctly with the Copy button.
-- Do not push this project to a public GitHub repository until `PUBLICATION_REVIEW.md` is resolved.
+- `PUBLICATION_REVIEW.md` documents the public-safe publication rules used by this repository.
 
 ## Prepare the technician USB
 
@@ -62,4 +62,4 @@ Command blocks also include **Copy** buttons for one-click command copying.
 
 ## GitHub status
 
-The project is structured for GitHub, but it has not been pushed. Review and approve publication first.
+This project is published on GitHub and structured for GitHub Pages.

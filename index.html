@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Windows 11 Autopilot ISO - Provisioning Procedure</title>
+    <title>Windows 11 Autopilot Provisioning Guide - ISO and USB Workflow</title>
     <meta name="author" content="Marius Dambu">
     <meta
       name="description"
-      content="English HTML procedure for building and using a Windows 11 Autopilot ISO for enterprise provisioning."
+      content="English HTML procedure for building and using Windows 11 Autopilot ISO and USB provisioning media."
     >
     <link rel="stylesheet" href="assets/css/styles.css">
   </head>
@@ -34,7 +34,7 @@
     <main class="page">
       <section class="hero">
         <p class="eyebrow">Enterprise technician procedure</p>
-        <h1>Windows 11 Autopilot ISO - Provisioning Procedure</h1>
+        <h1>Windows 11 Autopilot Provisioning Guide - ISO and USB Workflow</h1>
         <p class="subtitle">
           A practical English guide for creating a Windows 11 Autopilot installation USB,
           pre-provisioning a laptop, validating the user setup, and handling older devices
@@ -51,8 +51,8 @@
         <article class="notice warning">
           <h2>Network rule</h2>
           <p>
-            Never install or provision the laptop on the corporate network. Use a free Wi-Fi
-            network or an approved guest Wi-Fi during provisioning.
+            Never install or provision the laptop on the corporate network. Use an approved
+            external Wi-Fi, approved guest Wi-Fi, or other approved non-corporate network.
           </p>
         </article>
         <article class="notice">
@@ -92,8 +92,8 @@
             <h2>1. Scope</h2>
             <p>
               This procedure is intended for technicians preparing organization-managed laptops with a Windows
-              11 Autopilot ISO. It covers the original DISM-based workflow, the installation
-              screens, the Autopilot pre-provisioning flow, and the supporting
+              11 Autopilot ISO and USB media. It covers the DISM-based image workflow, the
+              installation screens, the Autopilot pre-provisioning flow, and the supporting
               technician USB scripts used to collect hardware hashes and run diagnostics.
             </p>
             <p>
@@ -147,7 +147,8 @@
 
             <div class="callout warning">
               <strong>Do not use corporate network access during provisioning.</strong>
-              Use a free Wi-Fi connection or an approved guest Wi-Fi. Do not use corporate Wi-Fi,
+              Use an approved external Wi-Fi, approved guest Wi-Fi, or another approved
+              non-corporate network. Do not use corporate Wi-Fi,
               a corporate wired network, or any network path that would make the laptop join internal
               resources before Autopilot has completed.
             </div>
@@ -363,13 +364,24 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               <strong>USB recommendation:</strong> use a pendrive of at least 16 GB. A USB 3.0 or
               faster drive is strongly recommended to reduce copy and installation time.
             </div>
-            <pre><code>Get-Disk
-pause
-Clear-Disk -Number 5 -RemoveData -RemoveOEM
-Set-Disk -Number 5 -PartitionStyle GPT
-New-Partition -DiskNumber 5 -Size 2048MB -AssignDriveLetter | Format-Volume -FileSystem FAT32
-New-Partition -DiskNumber 5 -UseMaximumSize -AssignDriveLetter | Format-Volume -FileSystem exFAT
-pause</code></pre>
+            <p>Run the commands one line at a time. First list the disks:</p>
+            <pre><code>Get-Disk</code></pre>
+            <p>
+              Identify the USB disk number from the output. Then set the variable below to that
+              exact USB disk number. Do not continue until you are certain it is the USB device.
+            </p>
+            <pre><code>[int]$UsbDiskNumber = Read-Host "Enter the USB disk number shown by Get-Disk"</code></pre>
+            <p>Verify the selected disk before wiping anything:</p>
+            <pre><code>Get-Disk -Number $UsbDiskNumber | Format-List Number,FriendlyName,SerialNumber,Size,BusType</code></pre>
+            <div class="callout warning">
+              <strong>Disk number warning:</strong> the commands below erase the selected disk.
+              Only continue if <code>$UsbDiskNumber</code> points to the USB drive, not the internal
+              laptop disk.
+            </div>
+            <pre><code>Clear-Disk -Number $UsbDiskNumber -RemoveData -RemoveOEM</code></pre>
+            <pre><code>Set-Disk -Number $UsbDiskNumber -PartitionStyle GPT</code></pre>
+            <pre><code>New-Partition -DiskNumber $UsbDiskNumber -Size 2048MB -AssignDriveLetter | Format-Volume -FileSystem FAT32</code></pre>
+            <pre><code>New-Partition -DiskNumber $UsbDiskNumber -UseMaximumSize -AssignDriveLetter | Format-Volume -FileSystem exFAT</code></pre>
 
             <h3>Required partition structure</h3>
             <p>
@@ -493,10 +505,11 @@ pause</code></pre>
             <h2>6. OOBE and Autopilot pre-provisioning</h2>
             <ol>
               <li>Complete the country/region and keyboard screens.</li>
-              <li>When asked for a network, connect only to a free Wi-Fi network or an approved guest Wi-Fi.</li>
+              <li>When asked for a network, connect only to an approved external Wi-Fi, approved guest Wi-Fi, or other approved non-corporate network.</li>
               <li>When the work or school setup screen appears, confirm the user has the required Azure group memberships before continuing.</li>
               <li class="highlight-step">
-                At OOBE, press the Windows key
+                At the work or school sign-in screen, before entering or connecting the user's
+                account, press the Windows key
                 <span class="inline-keycap windows-key" aria-label="Windows key">
                   <span class="windows-pane"></span>
                   <span class="windows-pane"></span>
@@ -602,6 +615,7 @@ pause</code></pre>
               </li>
               <li>Run <code>Run-HWID.cmd</code> or option 4 from <code>safeworkbench-en.cmd</code>.</li>
               <li>The script creates <code>C:\HWID</code>, installs/runs <code>Get-WindowsAutopilotInfo</code>, and exports a CSV.</li>
+              <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
               <li>When the USB label is correct, the file is copied to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> on the USB.</li>
               <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot HWID upload path&gt;</code>.</li>
               <li>Then follow the approved company escalation matrix to request Autopilot enrollment.</li>
@@ -610,7 +624,8 @@ pause</code></pre>
             <div class="callout note">
               The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow uses PowerShell Gallery
               and therefore needs internet access. The <code>GetAutoPilot\GetAutoPilot.CMD</code>
-              helper uses a local script and is designed for offline CSV export to its own folder.
+              helper uses a local script and is designed for local CSV generation to its own folder.
+              It does not upload the CSV to Intune and does not enroll the device.
             </div>
           </section>
 
@@ -667,7 +682,7 @@ pause</code></pre>
                   <tr>
                     <td><code>GetAutoPilot\GetAutoPilot.CMD</code></td>
                     <td>Additional second option for hardware hash export.</td>
-                    <td>Custom helper. Saves CSV output to the folder where the helper is executed. Use it as an additional local/offline export method when you want a direct CSV export.</td>
+                    <td>Custom helper. Saves CSV output to the folder where the helper is executed. It does not upload to Intune or enroll the device.</td>
                   </tr>
                 </tbody>
               </table>
@@ -710,7 +725,8 @@ pause</code></pre>
                   <li>Run <code>GetAutoPilot.CMD</code>.</li>
                   <li>The helper runs its local <code>Get-WindowsAutoPilotInfo.ps1</code> script.</li>
                   <li>The CSV is saved in the same <code>GetAutoPilot</code> folder.</li>
-                  <li>Use this as a second option when you want a direct local export instead of the standard workbench HWID flow.</li>
+                  <li>Do not open or edit the HWID CSV in Excel. Upload the generated CSV unchanged.</li>
+                  <li>Use this as a second option when you want a direct local CSV export instead of the standard workbench HWID flow. This does not upload to Intune or enroll the device.</li>
                 </ol>
               </div>
             </details>
@@ -734,7 +750,7 @@ pause</code></pre>
       </div>
 
       <footer class="footer">
-        <p>Windows 11 Autopilot ISO provisioning procedure for enterprise technicians.</p>
+        <p>Windows 11 Autopilot ISO and USB provisioning procedure for enterprise technicians.</p>
       </footer>
     </main>
 
