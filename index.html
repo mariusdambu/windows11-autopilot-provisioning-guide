@@ -181,12 +181,11 @@
           <section class="section" id="dism">
             <h2 id="dism-title">3. Optional DISM image customization</h2>
             <p>
-              Engineers can customize the image using DISM when automation is not available or when
-              full manual control is required. Skip this section if you are using the original
-              Windows 11 ISO or USB without injecting drivers. The examples below use the same
-              <code>C:\Lab_Win11\Trabajo</code> working-folder convention as the recommended
-              automation path. The example driver folder uses a Lenovo T14, but the same pattern
-              applies to other supported models.
+              Engineers can customize the image when drivers must be injected before Windows setup.
+              Skip this section if you are using the original Windows 11 ISO or USB without injecting
+              drivers. The preparation steps below are shared, then the technician chooses either the
+              Lab_Win11 assistant method or the manual DISM method. The example driver folder uses a
+              Lenovo T14, but the same pattern applies to other supported models.
             </p>
             <div class="callout success">
               <strong>Recommended path for most technicians:</strong>
@@ -211,9 +210,12 @@
 C:\Lab_Win11\Trabajo\ISOs      - Windows ISO files
 C:\Lab_Win11\Trabajo\images    - boot.wim, install.wim, install.esd or install*.swm
 C:\Lab_Win11\Trabajo\Drivers   - extracted INF drivers
-C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
+C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages
+C:\Lab_Win11\Trabajo\media     - temporary ISO staging folder used by the lab</code></pre>
             <div class="callout note">
-              <strong>Folder rule:</strong> keep real working files in the four folders above.
+              <strong>Folder rule:</strong> keep real payload in <code>ISOs</code>,
+              <code>images</code>, <code>Drivers</code>, and <code>packages</code>.
+              <code>Trabajo\media</code> is temporary and is created/cleaned by the ISO build flow.
               DISM still needs an empty temporary mount folder; for manual commands use
               <code>C:\Lab_Win11\Trabajo\offline</code> and keep it empty before mounting.
             </div>
@@ -245,8 +247,9 @@ C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
               </table>
             </div>
             <p>
-              These files are the input for Lab_Win11 helper workflows or the manual DISM commands.
-              The manual examples assume <code>install.wim</code>. If the ISO contains
+              This is common preparation for either customization method. These files are the input
+              for Lab_Win11 helper workflows or the manual DISM commands. The manual examples assume
+              <code>install.wim</code>. If the ISO contains
               <code>install.esd</code> or split <code>install*.swm</code> files, use the Lab_Win11
               helper flow to prepare the working image, or adjust the DISM commands accordingly.
             </p>
@@ -261,11 +264,41 @@ C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
             <p>Place the downloaded model-specific drivers in a folder, for example:</p>
             <pre><code>C:\Lab_Win11\Trabajo\Drivers\T14</code></pre>
 
+            <h3>Choose one customization method</h3>
+            <div class="callout warning">
+              <strong>Do not run both methods for the same image.</strong>
+              Use the Lab_Win11 assistant path or the manual DISM path. They are alternatives, not
+              consecutive steps.
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Method</th>
+                    <th>When to use it</th>
+                    <th>What the technician does</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Lab_Win11 assistant</strong></td>
+                    <td>Recommended when the lab is available and the technician wants guided image servicing.</td>
+                    <td>Run <code>C:\Lab_Win11\start_lab.cmd</code> and choose <strong>Assistant: service install.wim + boot.wim</strong>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Manual DISM</strong></td>
+                    <td>Use only when the assistant is not available or full manual control is required.</td>
+                    <td>Open the manual commands below, mount the image, inject drivers, and commit it yourself.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
             <details class="foldout">
               <summary>
                 <span class="foldout-title">
                   <strong>Manual DISM commands</strong>
-                  <small>Open this only when you need to mount the image, inject drivers, and commit manually.</small>
+                  <small>Alternative to the Lab_Win11 assistant. Do not run this after already servicing the same image with the assistant.</small>
                 </span>
                 <span class="foldout-action" aria-hidden="true">
                   <span class="closed-label">Show commands</span>
@@ -301,21 +334,19 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
 
             <h3>Use the customized image</h3>
             <p>
-              After committing the mounted image, the modified <code>install.wim</code> is only a
-              Windows image file. It will not boot by itself.
+              After either customization method, the modified <code>install.wim</code> is only a
+              Windows image file. It will not boot by itself. Choose one output path:
             </p>
-            <div class="callout note">
-              <strong>Normal USB workflow:</strong> continue to section 4 and prepare the USB from
-              the Windows ISO. If you customized the image, replace the install image in the exFAT
-              partition's
-              <code>sources</code> folder with the updated <code>install.wim</code> or equivalent
-              <code>install.*</code> files from <code>Trabajo\images</code>. Replace
-              <code>boot.wim</code> only if you customized it.
-            </div>
-            <p>
-              If you specifically need a rebuilt ISO file, for example to use it with Rufus, open
-              the advanced section below.
-            </p>
+            <ul>
+              <li>
+                <strong>Normal USB path:</strong> continue to section 4 and update the USB directly.
+                This is the simplest path for most technicians.
+              </li>
+              <li>
+                <strong>Custom ISO path:</strong> open the advanced section below only if you
+                specifically need a rebuilt ISO file, for example to use it with Rufus.
+              </li>
+            </ul>
 
             <details class="foldout compact">
               <summary>
@@ -330,6 +361,11 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                 </span>
               </summary>
               <div class="foldout-body">
+                <div class="callout warning">
+                  <strong>Choose one ISO rebuild method only.</strong>
+                  Use the Lab_Win11 ISO rebuild or the manual <code>oscdimg</code> rebuild. Do not
+                  run both for the same ISO.
+                </div>
                 <h4>Recommended ISO rebuild with Lab_Win11</h4>
                 <p>
                   Use this only when you need a custom ISO file, for example to select it in Rufus.
@@ -372,11 +408,42 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               large image files. Rufus can still be used as an optional shortcut when you are
               selecting a prepared ISO, but the resulting USB must match the required structure.
             </p>
+            <div class="callout warning">
+              <strong>Choose one final media path.</strong>
+              Either copy the original Windows ISO as-is, copy a custom ISO that already contains
+              the changes, or copy the original ISO and then replace <code>install.*</code> directly
+              on the exFAT partition. Do not mix these paths on the same USB.
+            </div>
+            <h3>Choose one USB creation method</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Method</th>
+                    <th>When to use it</th>
+                    <th>What the technician does</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Lab_Win11 USB method</strong></td>
+                    <td>Use when the lab is available and you want the guided USB workflow.</td>
+                    <td>Run <code>C:\Lab_Win11\start_lab.cmd</code> and choose <strong>Create Windows 11 USB</strong>. Do not run the manual disk commands below for the same USB.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Manual PowerShell method</strong></td>
+                    <td>Use when you want to prepare the two partitions yourself.</td>
+                    <td>Run the commands below carefully, using the correct USB disk number.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div class="callout note">
               <strong>USB recommendation:</strong> use a pendrive of at least 16 GB. A USB 3.0 or
               faster drive is strongly recommended to reduce copy and installation time.
             </div>
-            <p>Run the commands one line at a time. First list the disks:</p>
+            <h3>Manual PowerShell partition commands</h3>
+            <p>Use this only if you chose the manual PowerShell method. Run the commands one line at a time. First list the disks:</p>
             <pre><code>Get-Disk</code></pre>
             <p>
               Identify the USB disk number from the output. The commands below use
@@ -457,15 +524,15 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </div>
             <h3>Copy the files to the USB partitions</h3>
             <p>
-              After formatting the USB, mount the Windows ISO you want to deploy and copy the files
-              according to the table above. For the normal flow, mount the original Windows ISO. If
-              you rebuilt a custom ISO in the advanced section, mount that final ISO instead; the
-              customized image is already inside it.
+              Use this as the copy checklist for the manual USB method, or as the verification
+              checklist after the Lab_Win11 USB method. For the normal flow, mount the original
+              Windows ISO. If you rebuilt a custom ISO in the advanced section, mount that final ISO
+              instead; the customized image is already inside it.
             </p>
             <ol>
               <li>Copy <code>boot\</code>, <code>efi\</code>, <code>bootmgr</code>, <code>bootmgr.efi</code>, and only <code>sources\boot.wim</code> to the FAT32 partition.</li>
               <li>Copy the full Windows setup content, including the full <code>sources\</code> folder and <code>setup.exe</code>, to the exFAT partition.</li>
-              <li>If you are updating the USB directly instead of rebuilding the ISO, replace the exFAT partition's <code>sources\install.*</code> files with the updated files from <code>Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
+              <li>If you chose the direct USB replacement path, replace the exFAT partition's <code>sources\install.*</code> files with the updated files from <code>Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
             </ol>
           </section>
 

@@ -45,9 +45,11 @@ Command blocks also include **Copy** buttons for one-click command copying.
 - Manual DISM examples follow the `mariusdambu/Lab_Win11` payload folder convention:
   `C:\Lab_Win11\Trabajo\ISOs`, `C:\Lab_Win11\Trabajo\images`,
   `C:\Lab_Win11\Trabajo\Drivers`, and `C:\Lab_Win11\Trabajo\packages`.
-  The guide uses `C:\Lab_Win11\Trabajo\offline` as the temporary DISM mount folder.
+  The guide uses `C:\Lab_Win11\Trabajo\offline` as the temporary DISM mount folder and
+  `C:\Lab_Win11\Trabajo\media` as the Lab_Win11 temporary ISO staging folder.
 - The guide explains where to copy `sources\boot.wim` and `sources\install.*` from the mounted
-  Windows ISO, and how to rebuild either the ISO or the USB after driver injection.
+  Windows ISO, and separates the Lab_Win11 and manual paths for image servicing, ISO rebuild, and
+  USB creation.
 - Command blocks wrap on screen and in print so long DISM commands remain visible while still copying correctly with the Copy button.
 - `PUBLICATION_REVIEW.md` documents the public-safe publication rules used by this repository.
 
