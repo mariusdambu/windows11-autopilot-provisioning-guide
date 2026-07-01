@@ -245,6 +245,7 @@ h1 {
 }
 
 .section h2 {
+  scroll-margin-top: 92px;
   margin: 0 0 14px;
   font-size: 1.65rem;
 }

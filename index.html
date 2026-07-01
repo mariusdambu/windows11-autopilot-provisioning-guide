@@ -75,21 +75,21 @@
         <nav class="toc" aria-label="Table of contents">
           <h2>Contents</h2>
           <ol>
-            <li><a href="#scope">Scope</a></li>
-            <li><a href="#before-start">Before you start</a></li>
-            <li><a href="#dism">Optional DISM customization</a></li>
-            <li><a href="#usb">Create the USB</a></li>
-            <li><a href="#install">Install Windows</a></li>
-            <li><a href="#oobe">OOBE and Autopilot</a></li>
-            <li><a href="#post-setup">Post-setup tasks</a></li>
-            <li><a href="#usb-tools">Technician USB tools</a></li>
-            <li><a href="#hardware-hash">Older laptops and hardware hash</a></li>
+            <li><a href="#scope-title">Scope</a></li>
+            <li><a href="#before-start-title">Before you start</a></li>
+            <li><a href="#dism-title">Optional DISM customization</a></li>
+            <li><a href="#usb-title">Create the USB</a></li>
+            <li><a href="#install-title">Install Windows</a></li>
+            <li><a href="#oobe-title">OOBE and Autopilot</a></li>
+            <li><a href="#post-setup-title">Post-setup tasks</a></li>
+            <li><a href="#usb-tools-title">Technician USB tools</a></li>
+            <li><a href="#hardware-hash-title">Older laptops and hardware hash</a></li>
           </ol>
         </nav>
 
         <div class="content">
           <section class="section" id="scope">
-            <h2>1. Scope</h2>
+            <h2 id="scope-title">1. Scope</h2>
             <p>
               This procedure is intended for technicians preparing organization-managed laptops with a Windows
               11 Autopilot ISO and USB media. It covers the DISM-based image workflow, the
@@ -104,7 +104,7 @@
           </section>
 
           <section class="section" id="before-start">
-            <h2>2. Before you start</h2>
+            <h2 id="before-start-title">2. Before you start</h2>
 
             <h3>Required downloads and tools</h3>
             <ul>
@@ -179,7 +179,7 @@
           </section>
 
           <section class="section" id="dism">
-            <h2>3. Optional DISM image customization</h2>
+            <h2 id="dism-title">3. Optional DISM image customization</h2>
             <p>
               Engineers can customize the image using DISM when automation is not available or when
               full manual control is required. Skip this section if you are using the original
@@ -189,12 +189,10 @@
               applies to other supported models.
             </p>
             <div class="callout success">
-              <strong>Recommended simpler path:</strong>
-              for most technicians, the fastest and least error-prone option is to automate the DISM
-              workflow and ISO generation with
-              <a href="https://github.com/mariusdambu/Lab_Win11">mariusdambu/Lab_Win11</a>.
-              Use the manual DISM commands when you need full control or when automation is not
-              available.
+              <strong>Recommended path for most technicians:</strong>
+              prepare the Windows installation USB in section 4 and the technician USB in section 8.
+              Use this DISM customization section only when the laptop needs drivers injected before
+              setup or when a custom image is required.
             </div>
             <div class="callout note">
               <strong>This driver-injection step is optional but useful.</strong>
@@ -247,8 +245,8 @@ C:\Lab_Win11\Trabajo\packages  - CAB/MSU packages</code></pre>
               </table>
             </div>
             <p>
-              These files are the input for either the Lab_Win11 automation or the manual DISM
-              commands. The manual examples assume <code>install.wim</code>. If the ISO contains
+              These files are the input for Lab_Win11 helper workflows or the manual DISM commands.
+              The manual examples assume <code>install.wim</code>. If the ISO contains
               <code>install.esd</code> or split <code>install*.swm</code> files, use the Lab_Win11
               helper flow to prepare the working image, or adjust the DISM commands accordingly.
             </p>
@@ -301,33 +299,29 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </div>
             </details>
 
-            <h3>Turn the modified image into a bootable ISO</h3>
+            <h3>Use the customized image</h3>
             <p>
               After committing the mounted image, the modified <code>install.wim</code> is only a
-              Windows image file. It is not yet a bootable ISO and it will not boot by itself. Use
-              the Lab_Win11 automation to put the updated image back into Windows setup media.
+              Windows image file. It will not boot by itself.
             </p>
-            <ol>
-              <li>Confirm the DISM unmount/commit finished successfully.</li>
-              <li>Confirm the updated image is in <code>C:\Lab_Win11\Trabajo\images</code>, for example <code>install.wim</code>.</li>
-              <li>Keep the original Windows ISO in <code>C:\Lab_Win11\Trabajo\ISOs</code>.</li>
-              <li>Run <code>C:\Lab_Win11\start_lab.cmd</code> and choose the ISO creation option in the Lab_Win11 menu.</li>
-              <li>The lab reads the base ISO from <code>Trabajo\ISOs</code>, inserts the updated image files from <code>Trabajo\images</code>, and writes a new bootable ISO back to <code>Trabajo\ISOs</code>.</li>
-              <li>Use that final ISO in section 4 when creating the bootable USB.</li>
-            </ol>
             <div class="callout note">
-              <strong>USB-only alternative:</strong> if you are updating an existing bootable USB
-              instead of creating a new ISO, replace the install image in the exFAT partition's
+              <strong>Normal USB workflow:</strong> continue to section 4 and prepare the USB from
+              the Windows ISO. If you customized the image, replace the install image in the exFAT
+              partition's
               <code>sources</code> folder with the updated <code>install.wim</code> or equivalent
               <code>install.*</code> files from <code>Trabajo\images</code>. Replace
               <code>boot.wim</code> only if you customized it.
             </div>
+            <p>
+              If you specifically need a rebuilt ISO file, for example to use it with Rufus, open
+              the advanced section below.
+            </p>
 
             <details class="foldout compact">
               <summary>
                 <span class="foldout-title">
                   <strong>Advanced: rebuild ISO manually with ADK tools</strong>
-                  <small>Only if you are not using the automated ISO creation option.</small>
+                  <small>Only when you decide to create a custom ISO file.</small>
                 </span>
                 <span class="foldout-action" aria-hidden="true">
                   <span class="closed-label">Show details</span>
@@ -336,28 +330,42 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                 </span>
               </summary>
               <div class="foldout-body">
+                <h4>Recommended ISO rebuild with Lab_Win11</h4>
                 <p>
-                  If you need to generate a new ISO file manually, use <code>oscdimg</code>. This
-                  tool is part of the Windows ADK Deployment Tools.
+                  Use this only when you need a custom ISO file, for example to select it in Rufus.
+                  After committing the mounted image, the modified <code>install.wim</code> is still
+                  only a Windows image file. Lab_Win11 can place it back into Windows setup media.
                 </p>
-                <div class="callout success">
-                  <strong>Recommended:</strong> use the automated ISO creation option.
-                  It reads the base ISO from <code>Trabajo\ISOs</code>, uses custom images from
-                  <code>Trabajo\images</code>, prepares the temporary media internally, and writes the
-                  final ISO to <code>Trabajo\ISOs</code>.
-                </div>
                 <ol>
-                  <li>Copy all files from the mounted original ISO to a temporary media folder, for example <code>C:\Lab_Win11\Trabajo\Scratch\ISOFiles</code>.</li>
-                  <li>Replace <code>C:\Lab_Win11\Trabajo\Scratch\ISOFiles\sources\install.wim</code> with the updated <code>install.wim</code> from <code>C:\Lab_Win11\Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
+                  <li>Confirm the DISM unmount/commit finished successfully.</li>
+                  <li>Confirm the updated image is in <code>C:\Lab_Win11\Trabajo\images</code>, for example <code>install.wim</code>.</li>
+                  <li>Keep the original Windows ISO in <code>C:\Lab_Win11\Trabajo\ISOs</code>.</li>
+                  <li>Run <code>C:\Lab_Win11\start_lab.cmd</code> and choose the ISO creation option in the Lab_Win11 menu.</li>
+                  <li>The lab copies the selected base ISO or mounted Windows media into <code>Trabajo\media</code> as a temporary staging folder.</li>
+                  <li>It replaces <code>Trabajo\media\sources\install.*</code> from <code>Trabajo\images</code>. It also replaces <code>boot.wim</code> if a custom <code>Trabajo\images\boot.wim</code> exists.</li>
+                  <li>It creates the new bootable ISO from <code>Trabajo\media</code> and writes it back to <code>Trabajo\ISOs</code>. At the end, the lab asks whether to keep or clean <code>Trabajo\media</code>.</li>
+                  <li>Use that final ISO in section 4 when creating the bootable USB, or select it in Rufus if that is your chosen tool.</li>
+                </ol>
+
+                <h4>Manual ISO rebuild with oscdimg</h4>
+                <p>
+                  If you need to reproduce the ISO build manually, use the same staging idea:
+                  prepare <code>C:\Lab_Win11\Trabajo\media</code> with the full Windows setup
+                  content, replace the required files under <code>sources</code>, then run
+                  <code>oscdimg</code>. This tool is part of the Windows ADK Deployment Tools.
+                </p>
+                <ol>
+                  <li>Copy or mirror all files from the mounted original ISO to <code>C:\Lab_Win11\Trabajo\media</code>.</li>
+                  <li>Replace <code>C:\Lab_Win11\Trabajo\media\sources\install.wim</code> with the updated <code>install.wim</code> from <code>C:\Lab_Win11\Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
                   <li>Generate the bootable ISO and save it back to <code>Trabajo\ISOs</code>:</li>
                 </ol>
-                <pre><code>oscdimg -m -o -u2 -udfver102 -bootdata:2#p0,e,bC:\Lab_Win11\Trabajo\Scratch\ISOFiles\boot\etfsboot.com#pEF,e,bC:\Lab_Win11\Trabajo\Scratch\ISOFiles\efi\microsoft\boot\efisys.bin C:\Lab_Win11\Trabajo\Scratch\ISOFiles C:\Lab_Win11\Trabajo\ISOs\Win11_Autopilot.iso</code></pre>
+                <pre><code>oscdimg -m -bootdata:2#p0,e,b"C:\Lab_Win11\Trabajo\media\boot\etfsboot.com"#pEF,e,b"C:\Lab_Win11\Trabajo\media\efi\microsoft\boot\efisys.bin" -u1 -udfver102 "C:\Lab_Win11\Trabajo\media" "C:\Lab_Win11\Trabajo\ISOs\Win11_custom.iso"</code></pre>
               </div>
             </details>
           </section>
 
           <section class="section" id="usb">
-            <h2>4. Create the bootable USB</h2>
+            <h2 id="usb-title">4. Create the bootable USB</h2>
             <p>
               Use the Microsoft-documented two-partition USB layout below as the primary method.
               This keeps the boot partition simple and the Windows setup files separate from the
@@ -450,8 +458,9 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             <h3>Copy the files to the USB partitions</h3>
             <p>
               After formatting the USB, mount the Windows ISO you want to deploy and copy the files
-              according to the table above. If you rebuilt the ISO with Lab_Win11, mount the final
-              ISO from <code>Trabajo\ISOs</code>; the customized image is already inside it.
+              according to the table above. For the normal flow, mount the original Windows ISO. If
+              you rebuilt a custom ISO in the advanced section, mount that final ISO instead; the
+              customized image is already inside it.
             </p>
             <ol>
               <li>Copy <code>boot\</code>, <code>efi\</code>, <code>bootmgr</code>, <code>bootmgr.efi</code>, and only <code>sources\boot.wim</code> to the FAT32 partition.</li>
@@ -461,7 +470,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           </section>
 
           <section class="section" id="install">
-            <h2>5. Install Windows from USB</h2>
+            <h2 id="install-title">5. Install Windows from USB</h2>
             <ol>
               <li>Boot the laptop from the USB device. On Lenovo devices, press <strong>F12</strong> for the boot menu.</li>
               <li>Select the USB boot device.</li>
@@ -519,7 +528,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           </section>
 
           <section class="section" id="oobe">
-            <h2>6. OOBE and Autopilot pre-provisioning</h2>
+            <h2 id="oobe-title">6. OOBE and Autopilot pre-provisioning</h2>
             <ol>
               <li>Complete the country/region and keyboard screens.</li>
               <li>When asked for a network, connect only to an approved external Wi-Fi, approved guest Wi-Fi, or other approved non-corporate network.</li>
@@ -588,7 +597,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           </section>
 
           <section class="section" id="post-setup">
-            <h2>7. Post-setup validation and Intune task</h2>
+            <h2 id="post-setup-title">7. Post-setup validation and Intune task</h2>
             <p>After the user signs in and MFA is complete, validate the laptop before handing it over.</p>
             <ul class="checklist">
               <li>The required security client is installed and connected.</li>
@@ -616,7 +625,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           </section>
 
           <section class="section" id="usb-tools">
-            <h2>8. Technician USB tools reference</h2>
+            <h2 id="usb-tools-title">8. Technician USB tools reference</h2>
             <p>
               This project includes the technician USB tools under
               <code>tools\technician-usb</code>. Copy the contents of that folder to the root of the
@@ -693,7 +702,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           </section>
 
           <section class="section" id="hardware-hash">
-            <h2>9. Older laptops and hardware hash capture</h2>
+            <h2 id="hardware-hash-title">9. Older laptops and hardware hash capture</h2>
             <p>
               Some older laptops are not enrolled in Autopilot by default. When enrollment is
               required, use the prepared technician USB to collect the device hardware hash, then
