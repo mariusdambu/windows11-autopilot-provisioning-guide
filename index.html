@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Windows 11 Autopilot Provisioning Guide - ISO and USB Workflow</title>
+    <title>Windows 11 Autopilot Provisioning Guide - USB Workflow with Optional ISO Customization</title>
     <meta name="author" content="Marius Dambu">
     <meta
       name="description"
-      content="English HTML procedure for building and using Windows 11 Autopilot ISO and USB provisioning media."
+      content="English HTML procedure for preparing Windows 11 Autopilot USB provisioning media, with optional image and ISO customization."
     >
     <link rel="stylesheet" href="assets/css/styles.css">
   </head>
@@ -34,7 +34,7 @@
     <main class="page">
       <section class="hero">
         <p class="eyebrow">Enterprise technician procedure</p>
-        <h1>Windows 11 Autopilot Provisioning Guide - ISO and USB Workflow</h1>
+        <h1>Windows 11 Autopilot Provisioning Guide - USB Workflow with Optional ISO Customization</h1>
         <p class="subtitle">
           A practical English guide for creating a Windows 11 Autopilot installation USB,
           pre-provisioning a laptop, validating the user setup, and handling older devices
@@ -91,10 +91,10 @@
           <section class="section" id="scope">
             <h2 id="scope-title">1. Scope</h2>
             <p>
-              This procedure is intended for technicians preparing organization-managed laptops with a Windows
-              11 Autopilot ISO and USB media. It covers the DISM-based image workflow, the
-              installation screens, the Autopilot pre-provisioning flow, and the supporting
-              technician USB scripts used to collect hardware hashes and run diagnostics.
+              This procedure is intended for technicians preparing organization-managed laptops from
+              a Windows 11 ISO source and USB installation media. It covers the optional DISM-based
+              image workflow, the installation screens, the Autopilot pre-provisioning flow, and the
+              supporting technician USB scripts used to collect hardware hashes and run diagnostics.
             </p>
             <p>
               The expected end state is a Windows 11 laptop that has completed Autopilot
@@ -410,9 +410,10 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </p>
             <div class="callout warning">
               <strong>Choose one final media path.</strong>
-              Either copy the original Windows ISO as-is, copy a custom ISO that already contains
-              the changes, or copy the original ISO and then replace <code>install.*</code> directly
-              on the exFAT partition. Do not mix these paths on the same USB.
+              Either copy the contents of the original Windows ISO, copy the contents of a custom ISO
+              that already contains the changes, or copy the original ISO contents and then replace
+              <code>install.*</code> directly on the exFAT partition. Do not mix these paths on the
+              same USB.
             </div>
             <h3>Choose one USB creation method</h3>
             <div class="table-wrap">
@@ -819,7 +820,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
       </div>
 
       <footer class="footer">
-        <p>Windows 11 Autopilot ISO and USB provisioning procedure for enterprise technicians.</p>
+        <p>Windows 11 Autopilot USB provisioning procedure for enterprise technicians.</p>
       </footer>
     </main>
 

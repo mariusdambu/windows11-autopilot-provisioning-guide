@@ -1,6 +1,6 @@
-# Windows 11 Autopilot Provisioning Guide - ISO and USB Workflow
+# Windows 11 Autopilot Provisioning Guide - USB Workflow with Optional ISO Customization
 
-This project contains a portable English HTML guide for preparing Windows 11 Autopilot ISO and USB provisioning media for enterprise technicians.
+This project contains a portable English HTML guide for preparing Windows 11 Autopilot USB provisioning media from a Windows 11 ISO source, with optional image and ISO customization for enterprise technicians.
 
 Author: Marius Dambu
 
