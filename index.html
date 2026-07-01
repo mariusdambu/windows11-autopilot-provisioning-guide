@@ -301,26 +301,27 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               </div>
             </details>
 
-            <h3>After injecting drivers</h3>
+            <h3>Turn the modified image into a bootable ISO</h3>
             <p>
-              After committing the image, rebuild the deployment media before installing Windows.
-              Use one of these two paths:
+              After committing the mounted image, the modified <code>install.wim</code> is only a
+              Windows image file. It is not yet a bootable ISO and it will not boot by itself. Use
+              the Lab_Win11 automation to put the updated image back into Windows setup media.
             </p>
-            <ul>
-              <li>
-                <strong>ISO path:</strong> use the automated ISO creation option. It uses the base
-                ISO from <code>Trabajo\ISOs</code>, the updated images from
-                <code>Trabajo\images</code>, and writes the final ISO back to
-                <code>Trabajo\ISOs</code>.
-              </li>
-              <li>
-                <strong>USB path:</strong> recreate or update the bootable USB. Replace
-                <code>sources\boot.wim</code> on the FAT32 boot partition with
-                <code>Trabajo\images\boot.wim</code>. Replace the install image in the exFAT
-                partition's <code>sources</code> folder with the updated
-                <code>Trabajo\images\install.wim</code> or equivalent <code>install.*</code> files.
-              </li>
-            </ul>
+            <ol>
+              <li>Confirm the DISM unmount/commit finished successfully.</li>
+              <li>Confirm the updated image is in <code>C:\Lab_Win11\Trabajo\images</code>, for example <code>install.wim</code>.</li>
+              <li>Keep the original Windows ISO in <code>C:\Lab_Win11\Trabajo\ISOs</code>.</li>
+              <li>Run <code>C:\Lab_Win11\start_lab.cmd</code> and choose the ISO creation option in the Lab_Win11 menu.</li>
+              <li>The lab reads the base ISO from <code>Trabajo\ISOs</code>, inserts the updated image files from <code>Trabajo\images</code>, and writes a new bootable ISO back to <code>Trabajo\ISOs</code>.</li>
+              <li>Use that final ISO in section 4 when creating the bootable USB.</li>
+            </ol>
+            <div class="callout note">
+              <strong>USB-only alternative:</strong> if you are updating an existing bootable USB
+              instead of creating a new ISO, replace the install image in the exFAT partition's
+              <code>sources</code> folder with the updated <code>install.wim</code> or equivalent
+              <code>install.*</code> files from <code>Trabajo\images</code>. Replace
+              <code>boot.wim</code> only if you customized it.
+            </div>
 
             <details class="foldout compact">
               <summary>
@@ -337,11 +338,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               <div class="foldout-body">
                 <p>
                   If you need to generate a new ISO file manually, use <code>oscdimg</code>. This
-                  tool is part of the Windows ADK Deployment Tools. In this workflow, keep
-                  the base Windows ISO in <code>Trabajo\ISOs</code>, keep customized
-                  <code>boot.wim</code> and <code>install.*</code> files in
-                  <code>Trabajo\images</code>, and save the generated ISO back to
-                  <code>Trabajo\ISOs</code>.
+                  tool is part of the Windows ADK Deployment Tools.
                 </p>
                 <div class="callout success">
                   <strong>Recommended:</strong> use the automated ISO creation option.
@@ -349,6 +346,12 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
                   <code>Trabajo\images</code>, prepares the temporary media internally, and writes the
                   final ISO to <code>Trabajo\ISOs</code>.
                 </div>
+                <ol>
+                  <li>Copy all files from the mounted original ISO to a temporary media folder, for example <code>C:\Lab_Win11\Trabajo\Scratch\ISOFiles</code>.</li>
+                  <li>Replace <code>C:\Lab_Win11\Trabajo\Scratch\ISOFiles\sources\install.wim</code> with the updated <code>install.wim</code> from <code>C:\Lab_Win11\Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
+                  <li>Generate the bootable ISO and save it back to <code>Trabajo\ISOs</code>:</li>
+                </ol>
+                <pre><code>oscdimg -m -o -u2 -udfver102 -bootdata:2#p0,e,bC:\Lab_Win11\Trabajo\Scratch\ISOFiles\boot\etfsboot.com#pEF,e,bC:\Lab_Win11\Trabajo\Scratch\ISOFiles\efi\microsoft\boot\efisys.bin C:\Lab_Win11\Trabajo\Scratch\ISOFiles C:\Lab_Win11\Trabajo\ISOs\Win11_Autopilot.iso</code></pre>
               </div>
             </details>
           </section>
@@ -446,14 +449,14 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
             </div>
             <h3>Copy the files to the USB partitions</h3>
             <p>
-              After formatting the USB, mount the original or rebuilt Windows ISO and copy the files
-              according to the table above. Keep the FAT32 partition small and boot-focused; copy the
-              full Windows setup content to the exFAT partition.
+              After formatting the USB, mount the Windows ISO you want to deploy and copy the files
+              according to the table above. If you rebuilt the ISO with Lab_Win11, mount the final
+              ISO from <code>Trabajo\ISOs</code>; the customized image is already inside it.
             </p>
             <ol>
               <li>Copy <code>boot\</code>, <code>efi\</code>, <code>bootmgr</code>, <code>bootmgr.efi</code>, and only <code>sources\boot.wim</code> to the FAT32 partition.</li>
               <li>Copy the full Windows setup content, including the full <code>sources\</code> folder and <code>setup.exe</code>, to the exFAT partition.</li>
-              <li>If you customized the Windows image, use the updated <code>install.*</code> files from <code>Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
+              <li>If you are updating the USB directly instead of rebuilding the ISO, replace the exFAT partition's <code>sources\install.*</code> files with the updated files from <code>Trabajo\images</code>. Replace <code>boot.wim</code> only if you customized it.</li>
             </ol>
           </section>
 
