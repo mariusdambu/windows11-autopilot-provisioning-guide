@@ -33,7 +33,9 @@ body {
 
 a {
   color: var(--blue);
+  overflow-wrap: anywhere;
   text-underline-offset: 0.18em;
+  word-break: break-word;
 }
 
 a:hover {
