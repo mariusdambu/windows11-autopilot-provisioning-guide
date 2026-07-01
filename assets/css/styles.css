@@ -666,6 +666,14 @@ th {
     margin: 0;
   }
 
+  .layout {
+    display: block;
+  }
+
+  .content {
+    width: 100%;
+  }
+
   .hero {
     padding: 0 0 10pt;
   }
