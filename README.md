@@ -42,7 +42,7 @@ Command blocks also include **Copy** buttons for one-click command copying.
 - `safeworkbench-en.cmd` is recommended for technicians because it asks for confirmation before wiping Disk 0.
 - Option `4` creates the hardware hash file with the recommended Wi-Fi/internet workflow.
 - Option `5` creates the hardware hash file with the offline `GetAutoPilot/GetAutoPilot.CMD` fallback and saves the CSV in the `GetAutoPilot` folder.
-- Manual DISM examples follow the `mariusdambu/Lab_Win11` payload folder convention:
+- Manual DISM examples follow the [`mariusdambu/Lab_Win11`](https://github.com/mariusdambu/Lab_Win11) payload folder convention:
   `C:\Lab_Win11\Trabajo\ISOs`, `C:\Lab_Win11\Trabajo\images`,
   `C:\Lab_Win11\Trabajo\Drivers`, and `C:\Lab_Win11\Trabajo\packages`.
   The guide uses `C:\Lab_Win11\Trabajo\offline` as the temporary DISM mount folder and
