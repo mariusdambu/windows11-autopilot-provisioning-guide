@@ -16,7 +16,7 @@ Copy the contents of this folder to the root of official Windows 11 installation
 
 Start menu.cmd from Command Prompt in OOBE (Shift+F10). Menu options include:
 
-- 1 — Capture Autopilot Hash: offline local capture, then choose a generic Group Tag, enter a custom tag, or press Enter to omit it. CSV output is saved in HardwareIDs.
+- 1 — Capture Autopilot Hash: offline local capture, then choose a generic Group Tag, enter a custom tag, or press Enter to omit it. CSV output is saved in HardwareIDs. Asset Tag is optional and prefixes the CSV filename before the device serial.
 - 2 — Autopilot Diagnostics: runs the included community diagnostics script.
 - 3 — WIM Image Manager: SelectModel.cmd returns or activates install.wim. It requires the media sources folder; a missing folder is reported as an integrity error and is not created.
 - 4 — Quick Wipe Disk 0: runs immediately without a text confirmation.

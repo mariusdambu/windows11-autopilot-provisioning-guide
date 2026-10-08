@@ -36,7 +36,7 @@ Launch menu.cmd from Command Prompt during OOBE (Shift+F10). The unified menu pr
 
 Disk wipe warning: Quick Wipe runs immediately against Disk 0. Both wipe paths use DiskPart clean and convert the disk to GPT. Verify the target device and data before using either path.
 
-Get-AutopilotHash.ps1 reads the local Windows MDM hardware-detail provider and writes an Intune-compatible CSV under HardwareIDs. It does not install modules or download from PowerShell Gallery. Run it in Windows/OOBE; a bare WinPE environment may not expose the required provider. Group Tag presets are generic examples: confirm they match the destination tenant's enrollment design before use.
+Get-AutopilotHash.ps1 reads the local Windows MDM hardware-detail provider and writes an Intune-compatible CSV under HardwareIDs. Asset Tag is optional; when provided, it prefixes the filename before the device serial (AssetTag-Serial-HWID.csv). It does not install modules or download from PowerShell Gallery. Run it in Windows/OOBE; a bare WinPE environment may not expose the required provider. Group Tag presets are generic examples: confirm they match the destination tenant's enrollment design before use.
 
 SelectModel.cmd requires the official media's sources folder and does not create it. It moves install.wim between the media folder and model folders; keep backups of deployment images.
 

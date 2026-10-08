@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$OutputDir = "",
-    [string]$GroupTag = ""
+    [string]$GroupTag = "",
+    [string]$AssetTag = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -63,7 +64,20 @@ try {
         New-Item -Path $resolvedOutputDir -ItemType Directory -Force | Out-Null
     }
 
-    $csvPath = Join-Path -Path $resolvedOutputDir -ChildPath "$safeSerial-HWID.csv"
+    $AssetTag = ([string]$AssetTag).Trim()
+    $safeAssetTag = $AssetTag
+    foreach ($invalidChar in [IO.Path]::GetInvalidFileNameChars()) {
+        $safeAssetTag = $safeAssetTag.Replace($invalidChar, '-')
+    }
+    $safeAssetTag = $safeAssetTag.TrimEnd([char[]]@('.', ' '))
+    if ([string]::IsNullOrWhiteSpace($safeAssetTag)) {
+        $csvFileName = "$safeSerial-HWID.csv"
+    }
+    else {
+        # Keep the Autopilot CSV schema intact; use Asset Tag in the filename and summary.
+        $csvFileName = "$safeAssetTag-$safeSerial-HWID.csv"
+    }
+    $csvPath = Join-Path -Path $resolvedOutputDir -ChildPath $csvFileName
     $escapedSerial = $rawSerial.Replace('"', '""')
     $escapedHash = $hardwareHash.Replace('"', '""')
     if (-not [string]::IsNullOrWhiteSpace($GroupTag)) {
@@ -87,6 +101,10 @@ try {
     Write-Host ("  {0,-20}: {1}{2}{3}" -f "Serial Number", $C_CYAN, $rawSerial, $C_RESET)
     if (-not [string]::IsNullOrWhiteSpace($GroupTag)) {
         Write-Host ("  {0,-20}: {1}" -f "Group Tag", $GroupTag.Trim())
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($AssetTag)) {
+        Write-Host ("  {0,-20}: {1}" -f "Asset Tag", $AssetTag)
     }
     Write-Host ("  {0,-20}: {1}" -f "CSV File Path", $csvPath)
     Write-Host ("  {0,-20}: {1} characters" -f "Hash Length", $hardwareHash.Length)

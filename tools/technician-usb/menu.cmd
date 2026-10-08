@@ -68,9 +68,10 @@ goto MAIN_MENU
 set "OPT="
 set "GCHOICE="
 set "GTAG="
+set "ASSET="
 cls
 echo %C_GRAY%------------------------------------------------------------------------------------%C_RESET%
-echo  %C_BOLD%%C_WHITE%RAPIDDEPLOY WORKBENCH%C_RESET% %C_GRAY%^|%C_RESET% %C_CYAN%Autopilot Group Tag Selection%C_RESET%
+echo  %C_BOLD%%C_WHITE%RAPIDDEPLOY WORKBENCH%C_RESET% %C_GRAY%^|%C_RESET% %C_CYAN%Autopilot Profile ^& Asset Registration%C_RESET%
 echo %C_GRAY%------------------------------------------------------------------------------------%C_RESET%
 echo.
 echo   %C_BOLD%STANDARD PROFILES%C_RESET%                         %C_GRAY%^|%C_RESET%   %C_BOLD%HIGH SPEC PROFILES%C_RESET%
@@ -83,6 +84,8 @@ echo   %C_CYAN%[C]%C_RESET% Custom Group Tag (Type manually) %C_GRAY%^|%C_RESET%
 echo %C_GRAY%------------------------------------------------------------------------------------%C_RESET%
 echo.
 
+set "GCHOICE="
+set "GTAG="
 set /p "GCHOICE= >> Select preset [1-8], [C]ustom or press Enter to skip: "
 
 if "%GCHOICE%"=="1" set "GTAG=Standard-Desktop"
@@ -100,15 +103,15 @@ if /i "%GCHOICE%"=="C" (
 )
 
 echo.
-if defined GTAG (
-    echo   %C_GRAY%Exporting hash with Group Tag: %C_WHITE%!GTAG!%C_RESET%
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%ROOT%scripts\Get-AutopilotHash.ps1" -GroupTag "!GTAG!"
-) else (
-    echo   %C_GRAY%Exporting hash without Group Tag...%C_RESET%
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%ROOT%scripts\Get-AutopilotHash.ps1"
-)
+set "ASSET="
+set /p "ASSET= >> Enter Device Asset Tag (e.g. ABC123) or press Enter to skip: "
+echo.
+set "PS_ARGS="
+if defined GTAG set PS_ARGS=!PS_ARGS! -GroupTag "!GTAG!"
+if defined ASSET set PS_ARGS=!PS_ARGS! -AssetTag "!ASSET!"
+echo   %C_GRAY%Exporting Autopilot hardware hash...%C_RESET%
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%ROOT%scripts\Get-AutopilotHash.ps1" !PS_ARGS!
 goto PAUSA_MENU
-
 :DIAGNOSTICO
 cls
 echo %C_GRAY%------------------------------------------------------------------------------------%C_RESET%

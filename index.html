@@ -749,7 +749,7 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
               <li>During OOBE, open Command Prompt with <strong>Shift+F10</strong> and run <code>menu.cmd</code> from the USB root.</li>
               <li>Select <strong>1 — Capture Autopilot Hash (Offline)</strong>.</li>
               <li>Choose a generic Group Tag preset, enter a custom Group Tag, or press Enter to omit the tag. Confirm that any tag matches the destination tenant.</li>
-              <li>Retrieve the generated CSV from <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code>.</li>
+              <li>Optionally enter an Asset Tag; when provided, it prefixes the filename. Retrieve the CSV from <code>HardwareIDs\&lt;AssetTag&gt;-&lt;Serial&gt;-HWID.csv</code>, or <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code> when omitted.</li>
             </ol>
             <div class="callout note">
               <strong>The capture script works offline.</strong>
