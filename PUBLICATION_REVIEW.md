@@ -1,25 +1,16 @@
 # Publication Review
 
-This project is maintained as a public-safe version of the Windows 11 Autopilot provisioning guide.
+This repository is maintained as a public-safe Windows 11 Autopilot provisioning guide and technician toolkit.
 
-## Confirmed cleanup
+## Public-safety checks
 
-- Internal Azure group names are represented with placeholders.
-- Internal Intune group names are represented with placeholders.
-- Internal Teams channels, named contacts, and escalation details are represented with a generic escalation-matrix instruction.
-- Internal UNC paths are represented with placeholders.
-- Internal Wi-Fi SSIDs are represented as approved guest Wi-Fi.
-- Screenshots showing organization, tenant, profile, QR, or network details were redacted or omitted.
-- The technician USB label is generic: `AUTOPILOTUSB`.
-- Technician USB tools are included, but generated hardware hash CSV files are ignored by `.gitignore`.
+- Tenant-specific group names, support contacts, network names, internal upload paths, and screenshots with organization details are represented with placeholders or omitted.
+- The technician toolkit uses generic Group Tag profile examples; teams must adapt them to their own tenant before use.
+- The local hardware-hash capture workflow does not download scripts from PowerShell Gallery and does not upload CSVs automatically.
+- Generated hardware-hash CSV files are excluded by .gitignore.
+- No tenant credentials, device serials, or generated hardware-hash records should be committed.
+- The Disk 0 wipe actions and their destructive behavior are documented in the tool README and guide.
 
-## Public-safe placeholders used
+## Before publishing
 
-- `<Autopilot all-users group>`
-- `<Regional Autopilot users group>`
-- `<Temporary corporate Wi-Fi exclusion group>`
-- `<approved internal Autopilot HWID upload path>`
-
-## Publication guidance
-
-Keep real tenant names, support contacts, group names, upload paths, Wi-Fi names, and screenshots with organization details out of the public repository. If an internal team needs exact values, maintain them in a private appendix or in the company escalation matrix.
+Review added screenshots, commands, sample data, image paths, and support instructions for tenant identifiers or private operational details. Keep real group names, upload paths, Wi-Fi names, contacts, and tenant information out of the public repository.

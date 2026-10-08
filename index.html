@@ -696,77 +696,42 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           <section class="section" id="usb-tools">
             <h2 id="usb-tools-title">8. Technician USB tools reference</h2>
             <p>
-              Download or clone the project from
-              <a href="https://github.com/mariusdambu/windows11-autopilot-provisioning-guide">https://github.com/mariusdambu/windows11-autopilot-provisioning-guide</a>.
-              It includes the technician USB tools under
-              <code>tools\technician-usb</code>. Copy the contents of that folder to the root of the
-              technician USB and keep the folder structure exactly as provided.
+              The project includes a unified OOBE toolkit under
+              <code>tools\technician-usb</code>. Copy the contents of that folder to the root of
+              official Windows 11 installation media. Preserve the existing Windows setup folders,
+              especially <code>boot</code>, <code>efi</code>, and <code>sources</code>.
             </p>
-            <h3>Prepare the USB structure</h3>
-            <ol>
-              <li>Copy everything inside <code>tools\technician-usb</code> to the root of the USB.</li>
-              <li>Keep the <code>scripts</code> and <code>GetAutoPilot</code> folders next to the CMD files.</li>
-              <li>Create a folder called <code>HardwareIDs</code> at the root of the USB.</li>
-              <li>Rename the USB volume label to exactly <code>AUTOPILOTUSB</code> before running hardware hash capture.</li>
-              <li>Run <code>safeworkbench-en.cmd</code> as the preferred menu.</li>
-            </ol>
-            <h3>Expected folder layout</h3>
-            <pre><code>tools\technician-usb
-  safeworkbench-en.cmd
-  workbench-en.cmd
-  Run-HWID.cmd
-  Run-AutopilotDiagnostics.cmd
-  clean_disk0.txt
+            <h3>Expected toolkit layout</h3>
+            <pre><code>tools\technician-usb\
+  menu.cmd
+  SelectModel.cmd
+  HardwareIDs\
   scripts\
-    Get-WindowsAutoPilotInfo.ps1
+    clean_disk0.txt
+    Get-AutopilotHash.ps1
     Get-AutopilotDiagnosticsCommunity.ps1
-    read_me.txt
-  GetAutoPilot\
-    GetAutoPilot.CMD
-    Get-WindowsAutoPilotInfo.ps1</code></pre>
-
-            <h3>Understand the included tools</h3>
+    read_me.txt</code></pre>
+            <ol>
+              <li>Copy the toolkit contents to the Windows 11 USB root without replacing its setup files or folders.</li>
+              <li>Keep <code>menu.cmd</code>, <code>SelectModel.cmd</code>, and <code>HardwareIDs</code> at the USB root.</li>
+              <li>Keep the included scripts under <code>scripts</code> and retain the media's existing <code>sources</code> folder.</li>
+              <li>Open Command Prompt during OOBE with <strong>Shift+F10</strong>, switch to the USB, and run <code>menu.cmd</code>.</li>
+            </ol>
+            <h3>Menu functions</h3>
             <div class="callout warning">
-              <strong>Disk wipe warning:</strong> option 3 in the workbench wipes Disk 0. Use
-              <code>safeworkbench-en.cmd</code> unless you have a specific reason not to; it requires
-              typing <code>ERASE</code> before the wipe runs.
+              <strong>Disk wipe warning:</strong> Quick Wipe immediately runs DiskPart against Disk 0 without a text confirmation.
+              Safe Wipe requires typing <code>ERASE</code>. Both actions run <code>clean</code> and convert Disk 0 to GPT.
+              Verify the target and its data before using either option.
             </div>
-
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>File</th>
-                    <th>Purpose</th>
-                    <th>Notes</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Menu option</th><th>Purpose</th><th>Notes</th></tr></thead>
                 <tbody>
-                  <tr>
-                    <td><code>safeworkbench-en.cmd</code></td>
-                    <td>Recommended technician menu.</td>
-                    <td>English UI. Use this first. Adds a shutdown/restart delay and requires typing <code>ERASE</code> before wiping Disk 0.</td>
-                  </tr>
-                  <tr>
-                    <td><code>workbench-en.cmd</code></td>
-                    <td>Standard technician menu.</td>
-                    <td>English UI. Option 3 wipes Disk 0 through <code>clean_disk0.txt</code>; use carefully.</td>
-                  </tr>
-                  <tr>
-                    <td><code>Run-HWID.cmd</code></td>
-                    <td>Runs the hardware hash capture script.</td>
-                    <td>Calls <code>scripts\Get-WindowsAutoPilotInfo.ps1</code>. Requires approved Wi-Fi/internet access, PowerShell Gallery access, and the USB label <code>AUTOPILOTUSB</code>.</td>
-                  </tr>
-                  <tr>
-                    <td><code>Run-AutopilotDiagnostics.cmd</code></td>
-                    <td>Runs Autopilot diagnostics.</td>
-                    <td>Calls <code>scripts\Get-AutopilotDiagnosticsCommunity.ps1</code>.</td>
-                  </tr>
-                  <tr>
-                    <td><code>GetAutoPilot\GetAutoPilot.CMD</code></td>
-                    <td>Additional second option for hardware hash export.</td>
-                    <td>Custom offline helper. Saves CSV output in the <code>GetAutoPilot</code> folder. It does not upload to Intune or enroll the device.</td>
-                  </tr>
+                  <tr><td><code>1</code></td><td>Capture an Autopilot hardware hash.</td><td>Uses the local Windows MDM provider, with generic Group Tag presets, custom entry, or no tag. The CSV is saved under <code>HardwareIDs</code>.</td></tr>
+                  <tr><td><code>2</code></td><td>Run Autopilot diagnostics.</td><td>Runs the included community diagnostics script.</td></tr>
+                  <tr><td><code>3</code></td><td>Manage WIM images.</td><td>Starts <code>SelectModel.cmd</code>. The Windows media <code>sources</code> folder must already exist; the script reports an error instead of creating it.</td></tr>
+                  <tr><td><code>4</code> / <code>5</code></td><td>Quick Wipe / Safe Wipe of Disk 0.</td><td>Quick Wipe has no confirmation prompt; Safe Wipe requires typing <code>ERASE</code>. Both are destructive.</td></tr>
+                  <tr><td>Other options</td><td>Disk, network, and setup utilities.</td><td>Includes DiskPart, PowerShell, Wi-Fi settings, IP details, serial number, time sync, and MDM sync.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -775,45 +740,33 @@ dism /Mount-Image /ImageFile:"C:\Lab_Win11\Trabajo\images\install.wim" /Index:6 
           <section class="section" id="hardware-hash">
             <h2 id="hardware-hash-title">9. Older laptops and hardware hash capture</h2>
             <p>
-              Some older laptops are not enrolled in Autopilot by default. When enrollment is
-              required, use the prepared technician USB to collect the device hardware hash, then
-              upload the CSV file through the approved internal process.
+              When a device needs Autopilot registration, use the technician toolkit to create a
+              hardware-hash CSV, then submit it through your approved enrollment process.
             </p>
-
             <h3>Capture the hardware hash</h3>
             <ol>
-              <li>Use the technician USB prepared in the previous section.</li>
-              <li>
-                Confirm the USB volume label is exactly <code>AUTOPILOTUSB</code>. The script searches
-                for this label; if it is wrong, the CSV will not be copied back to the USB correctly.
-              </li>
-              <li>Boot or open Command Prompt on the target laptop, then open the technician USB drive.</li>
-              <li>Run <code>safeworkbench-en.cmd</code> as the preferred menu.</li>
-              <li>Before selecting <strong>4 - Create hardware hash file (recommended - Wi-Fi)</strong>, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.</li>
-              <li>If Wi-Fi is available, select option <strong>4 - Create hardware hash file (recommended - Wi-Fi)</strong>.</li>
-              <li>If Wi-Fi cannot be connected, or if option 4 fails because PowerShell Gallery cannot be reached, select <strong>5 - Create hardware hash file (offline fallback)</strong> instead.</li>
-              <li>Confirm where the CSV was saved: option 4 copies it to <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code>; option 5 saves it in the <code>GetAutoPilot</code> folder.</li>
+              <li>Prepare the Windows 11 USB with the toolkit described in the previous section.</li>
+              <li>During OOBE, open Command Prompt with <strong>Shift+F10</strong> and run <code>menu.cmd</code> from the USB root.</li>
+              <li>Select <strong>1 — Capture Autopilot Hash (Offline)</strong>.</li>
+              <li>Choose a generic Group Tag preset, enter a custom Group Tag, or press Enter to omit the tag. Confirm that any tag matches the destination tenant.</li>
+              <li>Retrieve the generated CSV from <code>HardwareIDs\&lt;Serial&gt;-HWID.csv</code>.</li>
             </ol>
-
             <div class="callout note">
-              <strong>Run option 4 only after Wi-Fi is connected.</strong>
-              The <code>scripts\Get-WindowsAutoPilotInfo.ps1</code> workflow downloads or updates
-              <code>Get-WindowsAutopilotInfo</code> from PowerShell Gallery, so the laptop must
-              already be connected to an approved Wi-Fi or approved non-corporate network before
-              running it. It only generates a local CSV and copies it to the USB; it does not upload
-              the CSV to Intune and does not enroll the device.
+              <strong>The capture script works offline.</strong>
+              <code>Get-AutopilotHash.ps1</code> reads the local <code>MDM_DevDetail_Ext01</code>
+              provider and does not install modules or download from PowerShell Gallery. Run it from
+              Windows/OOBE; bare WinPE may not expose the provider.
             </div>
             <div class="callout note">
-              <strong>Option 5 works without internet.</strong>
-              The <code>GetAutoPilot\GetAutoPilot.CMD</code> helper runs from the technician USB
-              without internet access and saves the CSV in the <code>GetAutoPilot</code> folder.
+              <strong>The CSV is not uploaded automatically.</strong>
+              Handle it through your approved Autopilot enrollment process. Do not commit hardware-hash
+              CSVs to the repository or open and resave them in spreadsheet software.
             </div>
-
             <h3>Upload the CSV</h3>
             <ol>
-              <li>Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.</li>
-              <li>Upload the hardware hash CSV to <code>&lt;approved internal Autopilot hardware hash upload path&gt;</code>.</li>
-              <li>Then follow the approved company escalation matrix to request Autopilot enrollment.</li>
+              <li>Keep the generated CSV unchanged.</li>
+              <li>Submit it using the approved internal Autopilot hardware-hash upload process.</li>
+              <li>Follow your organization's approved process for completing enrollment.</li>
             </ol>
           </section>
 

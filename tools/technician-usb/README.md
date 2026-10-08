@@ -1,49 +1,37 @@
 # Technician USB Tools
 
-After downloading or cloning the project, copy the contents of this folder to the root of the technician USB.
-Do not copy the parent project folder itself; copy the files and folders inside `tools/technician-usb`.
+Copy the contents of this folder to the root of official Windows 11 installation media. Keep the existing Windows setup files and folders, including boot, efi, sources, and support. Do not replace those folders. Keep the model image folders beside them.
 
-## Required USB layout
+## Layout
 
-```text
-<USB root>
-+-- safeworkbench-en.cmd
-+-- workbench-en.cmd
-+-- Run-HWID.cmd
-+-- Run-AutopilotDiagnostics.cmd
-+-- clean_disk0.txt
-+-- HardwareIDs
-+-- scripts
-|   +-- Get-WindowsAutoPilotInfo.ps1
-|   +-- Get-AutopilotDiagnosticsCommunity.ps1
-|   +-- read_me.txt
-+-- GetAutoPilot
-    +-- GetAutoPilot.CMD
-    +-- Get-WindowsAutoPilotInfo.ps1
-```
+    <Windows 11 USB root>
+    +-- menu.cmd
+    +-- SelectModel.cmd
+    +-- HardwareIDs/
+    +-- scripts/
+        +-- clean_disk0.txt
+        +-- Get-AutopilotHash.ps1
+        +-- Get-AutopilotDiagnosticsCommunity.ps1
+        +-- read_me.txt
 
-## Before running hardware hash capture
+Start menu.cmd from Command Prompt in OOBE (Shift+F10). Menu options include:
 
-1. Rename the USB volume label to exactly `AUTOPILOTUSB`.
-2. Make sure the `HardwareIDs` folder exists at the USB root.
-3. For the recommended method, connect the laptop to an approved Wi-Fi or approved non-corporate network with internet access.
-4. Run `safeworkbench-en.cmd`.
-5. Select option `4 - Create hardware hash file (recommended - Wi-Fi)`.
-6. If Wi-Fi cannot be connected or the PowerShell Gallery download fails, select `5 - Create hardware hash file (offline fallback)`.
-7. Confirm that the CSV is copied to `HardwareIDs\<Serial>-HWID.csv`.
-8. Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.
+- 1 — Capture Autopilot Hash: offline local capture, then choose a generic Group Tag, enter a custom tag, or press Enter to omit it. CSV output is saved in HardwareIDs.
+- 2 — Autopilot Diagnostics: runs the included community diagnostics script.
+- 3 — WIM Image Manager: SelectModel.cmd returns or activates install.wim. It requires the media sources folder; a missing folder is reported as an integrity error and is not created.
+- 4 — Quick Wipe Disk 0: runs immediately without a text confirmation.
+- 5 — Safe Wipe Disk 0: requires typing ERASE.
 
-## Additional GetAutoPilot option
+Destructive operation: Both wipe options run DiskPart clean on Disk 0 and convert it to GPT. Confirm the correct target and that its data can be erased before continuing. clean removes partition information; it is not a secure data-erasure method.
 
-`GetAutoPilot\GetAutoPilot.CMD` is an additional offline second option for local hardware hash export.
-It runs the local script in the `GetAutoPilot` folder and saves the CSV output in that same folder.
-It does not upload the CSV to Intune and does not enroll the device.
+Other menu utilities show disks and network details, open DiskPart or PowerShell, launch Wi-Fi settings, show the BIOS serial number, and trigger time or MDM synchronization. Network-dependent operations require working connectivity and may not be available in every OOBE/SYSTEM context.
 
-Use this helper when Wi-Fi cannot be connected or when the recommended method cannot download
-`Get-WindowsAutopilotInfo` from PowerShell Gallery.
-Do not open or edit the hardware hash CSV in Excel. Upload the generated CSV unchanged.
+## Hardware hash notes
 
-## Safety warning
+The included hash script queries MDM_DevDetail_Ext01 locally and does not call PowerShell Gallery. The provider is available in supported Windows/OOBE environments; bare WinPE may not expose it. The CSV is not uploaded automatically and should be handled according to your organization's approved process.
 
-`safeworkbench-en.cmd` is the recommended menu. It requires typing `ERASE` before wiping Disk 0.
-`workbench-en.cmd` can wipe Disk 0 with fewer safeguards and should be used only when the technician is certain.
+Generic Group Tag names are examples. Adapt them to the destination tenant before deployment. Custom entry and no-tag capture remain available.
+
+## WIM notes
+
+Keep SelectModel.cmd at the USB root, sources intact, and model folders at the root. The script deliberately does not create a missing sources folder. Back up images before moving or replacing them.

@@ -1,0 +1,4 @@
+select disk 0
+clean
+convert gpt
+exit

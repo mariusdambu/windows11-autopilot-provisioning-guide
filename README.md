@@ -1,69 +1,49 @@
-# Windows 11 Autopilot Provisioning Guide - USB Workflow with Optional ISO Customization
+# Windows 11 Autopilot Provisioning Guide
 
-This project contains a portable English HTML guide for preparing Windows 11 Autopilot USB provisioning media from a Windows 11 ISO source, with optional image and ISO customization for enterprise technicians.
+A portable English guide for preparing Windows 11 installation media and provisioning devices with Windows Autopilot. It covers OOBE, ISO and WIM handling, and a technician USB toolkit.
 
-Author: Marius Dambu
-
-## Open the guide
-
-Open `index.html` in a browser. The page has a built-in **Print** button that can be used to print the guide or export it from the browser print dialog.
-Command blocks also include **Copy** buttons for one-click command copying.
+Open index.html in a browser. Use its Print control to print or export the guide; command blocks include Copy buttons.
 
 ## Project structure
 
-```text
-.
-+-- index.html
-+-- README.md
-+-- PUBLICATION_REVIEW.md
-+-- assets
-    +-- css
-    |   +-- styles.css
-    +-- js
-    |   +-- print.js
-    +-- img
-        +-- *.jpg
-+-- tools
-    +-- technician-usb
-        +-- safeworkbench-en.cmd
-        +-- workbench-en.cmd
-        +-- Run-HWID.cmd
-        +-- Run-AutopilotDiagnostics.cmd
-        +-- clean_disk0.txt
-        +-- scripts
-        +-- GetAutoPilot
-```
+    .
+    +-- index.html
+    +-- README.md
+    +-- PUBLICATION_REVIEW.md
+    +-- assets/
+    +-- tools/
+        +-- technician-usb/
+            +-- menu.cmd
+            +-- SelectModel.cmd
+            +-- HardwareIDs/
+            +-- scripts/
+                +-- clean_disk0.txt
+                +-- Get-AutopilotHash.ps1
+                +-- Get-AutopilotDiagnosticsCommunity.ps1
+                +-- read_me.txt
 
-## Important notes
+## Technician USB toolkit
 
-- This is a public-safe version. Organization-specific group names, support contacts, network names, and internal upload paths are represented with placeholders.
-- Screenshots were redacted or omitted where they contained tenant/profile/QR data, organization names, or Wi-Fi SSIDs.
-- Technician USB tools are included under `tools/technician-usb`.
-- `safeworkbench-en.cmd` is recommended for technicians because it asks for confirmation before wiping Disk 0.
-- Option `4` creates the hardware hash file with the recommended Wi-Fi/internet workflow.
-- Option `5` creates the hardware hash file with the offline `GetAutoPilot/GetAutoPilot.CMD` fallback and saves the CSV in the `GetAutoPilot` folder.
-- Manual DISM examples follow the [`mariusdambu/Lab_Win11`](https://github.com/mariusdambu/Lab_Win11) payload folder convention:
-  `C:\Lab_Win11\Trabajo\ISOs`, `C:\Lab_Win11\Trabajo\images`,
-  `C:\Lab_Win11\Trabajo\Drivers`, and `C:\Lab_Win11\Trabajo\packages`.
-  The guide uses `C:\Lab_Win11\Trabajo\offline` as the temporary DISM mount folder and
-  `C:\Lab_Win11\Trabajo\media` as the Lab_Win11 temporary ISO staging folder.
-- The guide explains where to copy `sources\boot.wim` and `sources\install.*` from the mounted
-  Windows ISO, and separates the Lab_Win11 and manual paths for image servicing, ISO rebuild, and
-  USB creation.
-- Command blocks wrap on screen and in print so long DISM commands remain visible while still copying correctly with the Copy button.
-- `PUBLICATION_REVIEW.md` documents the public-safe publication rules used by this repository.
+Copy the contents of tools/technician-usb to the root of official Windows 11 installation media. Preserve the existing Windows setup files and folders, especially boot, efi, and sources; the WIM manager expects sources to exist. Add the model image folders alongside the setup folders as described in the guide.
 
-## Prepare the technician USB
+Launch menu.cmd from Command Prompt during OOBE (Shift+F10). The unified menu provides:
 
-1. After downloading or cloning this project, open the project folder.
-2. Copy everything inside `tools/technician-usb` to the root of the technician USB.
-3. The USB root should contain `safeworkbench-en.cmd`, `workbench-en.cmd`, `Run-HWID.cmd`, `Run-AutopilotDiagnostics.cmd`, `clean_disk0.txt`, `scripts`, `GetAutoPilot`, and `HardwareIDs`.
-4. Keep the `scripts` and `GetAutoPilot` folders next to the CMD files.
-5. Create a `HardwareIDs` folder at the root of the USB if it is missing.
-6. Rename the USB volume label to exactly `AUTOPILOTUSB` before running hardware hash capture.
-7. Run `safeworkbench-en.cmd` as the preferred technician menu.
-8. Use option `4` for the recommended hardware hash workflow, or option `5` if Wi-Fi is not available or the PowerShell Gallery download fails.
+- Offline Autopilot hardware-hash capture, with generic Group Tag presets, custom entry, or no tag.
+- Local Autopilot diagnostics.
+- WIM image management through SelectModel.cmd.
+- Quick Disk 0 wipe and a separate wipe that requires typing ERASE.
+- Disk, DiskPart, PowerShell, Wi-Fi, network, serial-number, time-sync, and MDM-sync utilities.
 
-## GitHub status
+Disk wipe warning: Quick Wipe runs immediately against Disk 0. Both wipe paths use DiskPart clean and convert the disk to GPT. Verify the target device and data before using either path.
 
-This project is published on GitHub and structured for GitHub Pages.
+Get-AutopilotHash.ps1 reads the local Windows MDM hardware-detail provider and writes an Intune-compatible CSV under HardwareIDs. It does not install modules or download from PowerShell Gallery. Run it in Windows/OOBE; a bare WinPE environment may not expose the required provider. Group Tag presets are generic examples: confirm they match the destination tenant's enrollment design before use.
+
+SelectModel.cmd requires the official media's sources folder and does not create it. It moves install.wim between the media folder and model folders; keep backups of deployment images.
+
+## Public-safe content
+
+The published toolkit uses generic Group Tag profiles and contains no tenant credentials or hardware-hash CSV data. Generated CSV files are ignored by Git. See PUBLICATION_REVIEW.md before publishing changes.
+
+## Guide scope
+
+The guide separates Windows media preparation, image servicing, ISO rebuilding, and USB creation. Manual DISM examples use the generic C:\Lab_Win11\Trabajo workspace convention. Review commands and paths for your environment before running them.
